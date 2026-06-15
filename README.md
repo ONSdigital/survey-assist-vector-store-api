@@ -1,2 +1,181 @@
-# survey-assist-vector-store-api
-A generic vector store and api used by survey assist. This can deploy either an industry, occupation or search as you type vector store
+# Survey Assist Vector Store API
+
+[![CI](https://github.com/ONSdigital/survey-assist-vector-store-api/actions/workflows/ci.yml/badge.svg?branch=main)]
+
+<!-- These could be split out
+![CI](https://github.com/ONSdigital/survey-assist-vector-store-api/actions/workflows/ci.yml/badge.svg)
+![Tests](https://github.com/ONSdigital/survey-assist-vector-store-api/actions/workflows/tests.yml/badge.svg)
+![Bandit](https://github.com/ONSdigital/survey-assist-vector-store-api/actions/workflows/security.yml/badge.svg)
+![Coverage](https://img.shields.io/codecov/c/github/ONSdigital/survey-assist-vector-store-api)
+-->
+
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![License](https://img.shields.io/github/license/ONSdigital/survey-assist-vector-store-api)
+![Release](https://img.shields.io/github/v/release/ONSdigital/survey-assist-vector-store-api)
+![Status](https://img.shields.io/badge/code%20status-in%20development%20-red)
+
+## Overview
+
+A generic vector store and api used by survey assist. This can deploy either an industry, occupation or search as you type vector store.
+
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Local Development Setup](#local-development-setup)
+- [Running Locally](#running-locally)
+- [Configuration](#configuration)
+- [Testing](#testing)
+- [Code Quality](#code-quality)
+- [Security](#security)
+- [Documentation](#documentation)
+- [Release Process](#release-process)
+- [Repository Structure](#repository-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Maintainers](#maintainers)
+
+
+## Features
+
+- FastAPI endpoints
+- Industry (SIC) vector search
+- Occupation (SOC) vector search
+- Vector store integration
+- API Documentation
+
+## Architecture
+
+The vector store API consists of:
+
+- FastAPI endpoints
+- ClassifAI used for vector store
+- all-MiniLM-L6-v2 used for embeddings
+- Deployed as a Google Cloud Run service
+
+Depending upon configuration the code will deploy and industry, occupation or search as you type vector store.
+
+**Important** - In the deployed solution, this service is private to GCP services, it will only be called via the main Survey Assist API.
+
+## Prerequisites
+
+- Python 3.12
+- Poetry 2.1.3 or later
+- Git
+- Make
+- Docker / Colima (optional) / Podman
+- Google Cloud SDK
+
+## Local Development Setup
+
+### Clone Repository
+
+```shell
+git clone https://github.com/ONSdigital/survey-assist-vector-store-api.git
+```
+
+### Install Dependencies
+
+```shell
+poetry install
+```
+
+### Install Git Hooks
+
+This repository uses pre-commit hooks to perform code quality,
+security, and secret-scanning checks before code is committed.
+
+```shell
+poetry run pre-commit install
+poetry run pre-commit install --hook-type pre-push
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
+
+## Running Locally
+
+### Start Application
+
+make run
+
+### API Documentation
+
+http://localhost:8080/docs
+
+## Configuration
+
+Add any environment variables here.
+
+| Variable | Description | Required | Notes |
+|-----------|-------------|----------|-------|
+| SOURCE_INDEX_FILE | The index used to build the vector store embeddings | No | Required to build embeddings |
+| VECTOR_STORE_DIR | The location of the built index | No | Default to data/vector_store in source |
+
+## Repository Structure
+
+Update as the repository evolves
+
+```txt
+survey-assist-vector-store-api/
+|-- cicd/                           # GCP cloud build cicd pipelines
+|-- docs/                           # mkdocs documentation
+|-- scripts/                        # scripts not used inline in the application
+|-- src/                            # main source
+|-- tests/                          # pytest unit tests
+|-- .github/                        # GitHub actions workflows
+|-- README.md                       # This file
+```
+
+## Testing
+
+Run all of the unit tests
+
+```shell
+make all-tests
+```
+
+Additional testing guidance is available in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Code Quality
+
+Running validation checks:
+
+```shell
+make check-python-nofix
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards and validation requirements.
+
+## Security
+
+Security checks are performed using:
+
+- Bandit
+- GitHub Dependabot
+- Secret scanning
+
+Security vulnerabilities **must not** be disclosed publicly.
+
+See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
+
+## Documentation
+
+Documentation is maintained using MkDocs.
+
+```shell
+make run-docs
+```
+
+## Contributing
+
+Please read [the contribution guidelines](CONTRIBUTING.md) before creating a pull request.
+
+## Additional Documentation
+
+[CONTRIBUTING.md](CONTRIBUTING.md)
+[RELEASING.md](RELEASING.md)
+[SECURITY.md](SECURITY.md)
+[CHANGELOG.md](CHANGELOG.md)
+[LICENSE.md](LICENSE.md)
+[CODEOWNERS.md](CODEOWNERS.md)
