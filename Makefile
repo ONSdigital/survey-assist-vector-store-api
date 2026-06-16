@@ -90,6 +90,10 @@ pre-commit-install:
 	poetry run pre-commit install
 	poetry run pre-commit install --hook-type pre-push
 
+.PHONY: pre-push-run
+pre-push-run:
+	poetry run pre-commit run --hook-stage pre-push --all-files
+
 .PHONY: pre-commit-run
 pre-commit-run:
 	poetry run pre-commit run --all-files

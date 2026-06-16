@@ -22,8 +22,23 @@ repos:
 
   - repo: local
     hooks:
+      - id: check-python-staged
+        name: Check staged Python files
+        entry: poetry run ruff check --fix
+        language: system
+        types: [python]
+        stages: [pre-commit]
+
+      - id: format-python-staged
+        name: Format staged Python files
+        entry: poetry run ruff format
+        language: system
+        types: [python]
+        stages: [pre-commit]
+
       - id: check-python-nofix
-        name: Run Python linting, type checks and security checks
+        name: Run full Python linting, type checks and security checks
         entry: make check-python-nofix
         language: system
         pass_filenames: false
+        stages: [pre-push]
