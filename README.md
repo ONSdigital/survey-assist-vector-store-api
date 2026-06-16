@@ -97,7 +97,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 ### Start Application
 
-make run
+make run-vector-store
 
 ### API Documentation
 
