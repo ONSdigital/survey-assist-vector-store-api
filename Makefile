@@ -36,6 +36,7 @@ check-python: ## Format the python code (auto fix)
 .PHONY: check-python-nofix
 check-python-nofix: ## Format the python code (no fix)
 	poetry run ruff check .
+	poetry run ruff format --check .
 	poetry run mypy --follow-untyped-imports src/survey_assist_vector_store_api
 	poetry run pylint --verbose .
 	poetry run bandit -r src/survey_assist_vector_store_api/api src/survey_assist_vector_store_api/utils
