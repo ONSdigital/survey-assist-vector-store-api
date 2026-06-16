@@ -95,3 +95,12 @@ omit = [
 [tool.coverage.report]
 show_missing = true
 fail_under = 80
+
+[tool.pytest.ini_options]
+markers = [
+    "utils: mark a test as a utils test",
+    "api: mark a test as an api test",
+]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s - %(levelname)s - %(message)s"
