@@ -28,14 +28,14 @@ run-docs: ## Run the mkdocs
 .PHONY: check-python
 check-python: ## Format the python code (auto fix)
 	poetry run ruff check . --fix
-	poetry run mypy --follow-untyped-imports  .
+	poetry run mypy --follow-untyped-imports src/survey_assist_vector_store_api
 	poetry run pylint --verbose .
 	poetry run bandit -r src/survey_assist_vector_store_api/api src/survey_assist_vector_store_api/utils
 
 .PHONY: check-python-nofix
 check-python-nofix: ## Format the python code (no fix)
 	poetry run ruff check .
-	poetry run mypy --follow-untyped-imports  .
+	poetry run mypy --follow-untyped-imports src/survey_assist_vector_store_api
 	poetry run pylint --verbose .
 	poetry run bandit -r src/survey_assist_vector_store_api/api src/survey_assist_vector_store_api/utils
 
@@ -45,11 +45,11 @@ unit-tests: ## Run the example unit tests
 
 .PHONY: api-tests
 api-tests: ## Run the example API tests
-	poetry run pytest --ignore=cicd -m api --cov=survey_assist_vector_store_api --cov-report=term-missing --cov-fail-under=80 --cov-config=.coveragerc
+	poetry run pytest --ignore=cicd -m api --cov=survey_assist_vector_store_api --cov-report=term-missing --cov-fail-under=80
 
 .PHONY: all-tests
 all-tests:
-	poetry run pytest --ignore=cicd --cov=. --cov-report=term-missing --cov-fail-under=80 --cov-config=.coveragerc
+	poetry run pytest --ignore=cicd --cov --cov-report=term-missing --cov-fail-under=80
 
 .PHONY: install
 install: ## Install the dependencies

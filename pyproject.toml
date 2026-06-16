@@ -82,3 +82,16 @@ convention = "google"
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/cicd/*",
+    "*/scripts/*",
+    "*/docs/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
