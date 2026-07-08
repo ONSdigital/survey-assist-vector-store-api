@@ -4,6 +4,7 @@ import importlib.util
 import runpy
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from survey_assist_embed_core.adapters.classifai.vector_backend import (
@@ -58,8 +59,8 @@ def _load_script_module():
     return module
 
 
-@pytest.fixture
-def script(
+@pytest.fixture(name="script")
+def script_fixture(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ):
@@ -90,11 +91,12 @@ def test_script_runs_main_when_executed_as_main_module(
         / "build_vector_store_artifacts.py"
     )
 
-    class DummyLogger:
-        """Minimal logger double that accepts structured info calls."""
+    def fake_info(*_args, **_kwargs) -> None:
+        """Ignore info logs during the test."""
 
-        def info(self, *_args, **_kwargs) -> None:
-            """Ignore info logs during the test."""
+    def fake_get_logger(_name: str) -> SimpleNamespace:
+        """Return a minimal logger-like object for the script under test."""
+        return SimpleNamespace(info=fake_info)
 
     def fake_build_embedding_index(**kwargs: str) -> None:
         calls.append(kwargs)
@@ -109,7 +111,7 @@ def test_script_runs_main_when_executed_as_main_module(
     )
     monkeypatch.setattr(
         "survey_assist_utils.logging.get_logger",
-        lambda _name: DummyLogger(),
+        fake_get_logger,
     )
 
     with pytest.raises(SystemExit) as exc_info:

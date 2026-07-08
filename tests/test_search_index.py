@@ -13,7 +13,7 @@ from survey_assist_vector_store_api.api import main as main_module
 from survey_assist_vector_store_api.api.main import create_app
 
 
-class FakeEmbeddingHandler:
+class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
     """Simple test double for the embed-core handler."""
 
     def __init__(self, response: SearchIndexResponse | None = None):
@@ -91,7 +91,7 @@ def test_search_index_route_validates_query_payload(
         )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
-    assert fake_handler.calls == []
+    assert not fake_handler.calls
 
 
 @pytest.mark.api

@@ -11,8 +11,8 @@ from survey_assist_vector_store_api.api import main as main_module
 from survey_assist_vector_store_api.api.main import create_app
 
 
-@pytest.fixture
-def fake_lifespan(monkeypatch: pytest.MonkeyPatch):
+@pytest.fixture(name="fake_lifespan")
+def fake_lifespan_fixture(monkeypatch: pytest.MonkeyPatch):
     """Patch the concrete app lifespan so tests do not load a real vector store."""
 
     async def _empty_lifespan(_app: FastAPI):
@@ -24,7 +24,8 @@ def fake_lifespan(monkeypatch: pytest.MonkeyPatch):
 
 
 @pytest.mark.api
-def test_create_app_applies_overrides_to_app_and_root_route(fake_lifespan) -> None:
+@pytest.mark.usefixtures("fake_lifespan")
+def test_create_app_applies_overrides_to_app_and_root_route() -> None:
     """Verify that create_app applies configuration overrides to the app."""
     app = create_app(
         title="Test API",
@@ -44,8 +45,8 @@ def test_create_app_applies_overrides_to_app_and_root_route(fake_lifespan) -> No
 
 
 @pytest.mark.api
+@pytest.mark.usefixtures("fake_lifespan")
 def test_create_app_uses_metadata_helpers_by_default(
-    fake_lifespan,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify that create_app delegates default metadata and version resolution."""

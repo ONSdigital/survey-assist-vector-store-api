@@ -8,7 +8,7 @@ from survey_assist_vector_store_api.api.deps import vector_store as vector_store
 from survey_assist_vector_store_api.api.deps.settings import VectorStoreApiSettings
 
 
-class FakeEmbeddingHandler:
+class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
     """Constructor double for the concrete embedding handler."""
 
     def __init__(self, *, db_dir: str, k_matches: int, backend: object):
@@ -44,9 +44,11 @@ def test_build_embedding_handler_uses_settings(
     handler = vector_store_module.build_embedding_handler(settings)
 
     assert isinstance(handler, FakeEmbeddingHandler)
-    assert handler.db_dir == "sic-store"
-    assert handler.k_matches == expected_k_matches
-    assert handler.backend is backend_marker
+    assert vars(handler) == {
+        "db_dir": "sic-store",
+        "k_matches": expected_k_matches,
+        "backend": backend_marker,
+    }
 
 
 @pytest.mark.api

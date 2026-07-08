@@ -31,7 +31,7 @@ check-python: ## Format the python code (auto fix)
 	poetry run ruff format .
 	poetry run mypy --follow-untyped-imports src/survey_assist_vector_store_api
 	poetry run pylint --verbose .
-	poetry run bandit -r src/survey_assist_vector_store_api/api src/survey_assist_vector_store_api/utils
+	poetry run bandit -r src/survey_assist_vector_store_api
 
 .PHONY: check-python-nofix
 check-python-nofix: ## Format the python code (no fix)
@@ -39,7 +39,7 @@ check-python-nofix: ## Format the python code (no fix)
 	poetry run ruff format --check .
 	poetry run mypy --follow-untyped-imports src/survey_assist_vector_store_api
 	poetry run pylint --verbose .
-	poetry run bandit -r src/survey_assist_vector_store_api/api src/survey_assist_vector_store_api/utils
+	poetry run bandit -r src/survey_assist_vector_store_api
 
 .PHONY: unit-tests
 unit-tests: ## Run the example unit tests
