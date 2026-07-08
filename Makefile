@@ -15,7 +15,7 @@ API_CMD=poetry run uvicorn survey_assist_vector_store_api.api.main:app --host 0.
 
 .PHONY: build-vector-store
 build-vector-store: ## Build the vector store
-	poetry run python src/survey_assist_vector_store_api/utils/build_vector_store_index.py
+	poetry run python scripts/build_vector_store_artifacts.py
 
 .PHONY: run-vector-store
 run-vector-store: ## Run the vector store and API
