@@ -1,9 +1,10 @@
 """Tests for the main FastAPI application."""
 
+import asyncio
 from contextlib import asynccontextmanager
 
 import pytest
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, status
 from fastapi.testclient import TestClient
 
 from survey_assist_vector_store_api.api import main as main_module
@@ -73,3 +74,25 @@ def test_create_app_uses_metadata_helpers_by_default(
     assert app.title == "SIC Vector Store API"
     assert app.description == "API for interacting with the SIC vector store"
     assert app.version == "1.2.3"
+
+
+@pytest.mark.api
+def test_generic_error_handler_returns_generic_500(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify that the generic exception handler returns the expected 500 body."""
+    printed: list[str] = []
+    request = Request({"type": "http", "headers": []})
+
+    def fake_print(message: str) -> None:
+        printed.append(message)
+
+    monkeypatch.setattr("builtins.print", fake_print)
+
+    response = asyncio.run(
+        main_module.generic_error_handler(request, RuntimeError("boom"))
+    )
+
+    assert printed == ["Unexpected error: boom"]
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert response.body == b'{"detail":"An unexpected error occurred"}'

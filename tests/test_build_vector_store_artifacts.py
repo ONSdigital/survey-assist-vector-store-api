@@ -1,10 +1,41 @@
 """Tests for the vector-store artifact build script."""
 
 import importlib.util
+import runpy
 import sys
 from pathlib import Path
 
 import pytest
+from survey_assist_embed_core.adapters.classifai.vector_backend import (
+    DEFAULT_CLASSIFAI_EMBEDDING_MODEL_NAME,
+)
+
+SCRIPT_ENV_VARS = (
+    "INDEX_SOURCE_FILE",
+    "index_source_file",
+    "SOURCE",
+    "source",
+    "SRC",
+    "src",
+    "VECTOR_STORE_DIR",
+    "vector_store_dir",
+    "STORE",
+    "store",
+    "DB_DIR",
+    "db_dir",
+    "OUTPUT_DIR",
+    "output_dir",
+    "EMBEDDING_MODEL_NAME",
+    "embedding_model_name",
+    "MODEL",
+    "model",
+)
+
+
+def _clear_script_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Remove script-related environment variables for isolated test runs."""
+    for env_var in SCRIPT_ENV_VARS:
+        monkeypatch.delenv(env_var, raising=False)
 
 
 def _load_script_module():
@@ -34,6 +65,7 @@ def script(
 ):
     """Provide the build script module loaded from the scripts directory."""
     monkeypatch.chdir(tmp_path)
+    _clear_script_env_vars(monkeypatch)
     return _load_script_module()
 
 
@@ -43,6 +75,54 @@ def _set_script_argv(
 ) -> None:
     """Set sys.argv to mimic invoking the build script from the shell."""
     monkeypatch.setattr(sys, "argv", ["build_vector_store_artifacts.py", *args])
+
+
+@pytest.mark.utils
+def test_script_runs_main_when_executed_as_main_module(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Verify that the __main__ entrypoint delegates to main and exits cleanly."""
+    calls: list[dict[str, str]] = []
+    script_path = (
+        Path(__file__).resolve().parents[1]
+        / "scripts"
+        / "build_vector_store_artifacts.py"
+    )
+
+    class DummyLogger:
+        """Minimal logger double that accepts structured info calls."""
+
+        def info(self, *_args, **_kwargs) -> None:
+            """Ignore info logs during the test."""
+
+    def fake_build_embedding_index(**kwargs: str) -> None:
+        calls.append(kwargs)
+
+    monkeypatch.chdir(tmp_path)
+    _clear_script_env_vars(monkeypatch)
+    monkeypatch.setenv("INDEX_SOURCE_FILE", "data/source.csv")
+    _set_script_argv(monkeypatch)
+    monkeypatch.setattr(
+        "survey_assist_embed_core.build_embedding_index",
+        fake_build_embedding_index,
+    )
+    monkeypatch.setattr(
+        "survey_assist_utils.logging.get_logger",
+        lambda _name: DummyLogger(),
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        runpy.run_path(str(script_path), run_name="__main__")
+
+    assert exc_info.value.code == 0
+    assert calls == [
+        {
+            "index_source_file": "data/source.csv",
+            "output_dir": "vector_store",
+            "embedding_model_name": DEFAULT_CLASSIFAI_EMBEDDING_MODEL_NAME,
+        }
+    ]
 
 
 @pytest.mark.utils

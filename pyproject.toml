@@ -95,8 +95,8 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.coverage.run]
-source = ["src"]
-omit = ["*/tests/*", "*/cicd/*", "*/scripts/*", "*/docs/*"]
+source = ["src", "scripts"]
+omit = ["*/tests/*", "*/cicd/*", "*/docs/*"]
 
 [tool.coverage.report]
 show_missing = true
