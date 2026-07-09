@@ -49,13 +49,13 @@ def create_app(
 
     Args:
         title: Application title for API documentation. When omitted, a
-            knowledgebase-specific default is derived from settings.
+            generic API default is used.
         description: Application description for API documentation. When
-            omitted, a knowledgebase-specific default is derived from settings.
+            omitted, a generic API default is used.
         version: Application version for API documentation. When omitted, the
             installed package version is used.
         root_message: Message returned by the root endpoint. When omitted, a
-            knowledgebase-specific default is derived from settings.
+            generic API default is used.
         api_prefix: URL prefix for included API routers.
 
     Returns:

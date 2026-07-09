@@ -2,9 +2,10 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
-from survey_assist_vector_store_api.api.deps.settings import get_settings
-
 PACKAGE_DISTRIBUTION_NAME = "survey-assist-vector-store-api"
+DEFAULT_APP_TITLE = "Vector Store API"
+DEFAULT_APP_DESCRIPTION = "API for interacting with the vector store"
+DEFAULT_ROOT_MESSAGE = "Vector Store API is running"
 
 
 def resolve_app_metadata(
@@ -13,24 +14,17 @@ def resolve_app_metadata(
     description: str | None,
     root_message: str | None,
 ) -> tuple[str, str, str]:
-    """Resolve deployment-specific app metadata.
+    """Resolve application metadata.
 
-    Returns explicit overrides when provided. Otherwise derives metadata from
-    the configured knowledgebase name so separate deployments can identify the
-    underlying vector store they serve.
+    Returns explicit overrides when provided. Otherwise uses generic metadata
+    for the API documentation and root endpoint.
     """
     if title is not None and description is not None and root_message is not None:
         return title, description, root_message
 
-    knowledgebase_name = get_settings().knowledgebase_name
-
-    resolved_title = title or f"{knowledgebase_name} Vector Store API"
-    resolved_description = (
-        description or f"API for interacting with the {knowledgebase_name} vector store"
-    )
-    resolved_root_message = (
-        root_message or f"{knowledgebase_name} Vector Store API is running"
-    )
+    resolved_title = title or DEFAULT_APP_TITLE
+    resolved_description = description or DEFAULT_APP_DESCRIPTION
+    resolved_root_message = root_message or DEFAULT_ROOT_MESSAGE
     return resolved_title, resolved_description, resolved_root_message
 
 

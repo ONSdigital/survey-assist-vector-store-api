@@ -54,9 +54,9 @@ def test_create_app_uses_metadata_helpers_by_default(
         main_module,
         "resolve_app_metadata",
         lambda *, title, description, root_message: (
-            "SIC Vector Store API",
-            "API for interacting with the SIC vector store",
-            "SIC Vector Store API is running",
+            "Vector Store API",
+            "API for interacting with the vector store",
+            "Vector Store API is running",
         ),
     )
     monkeypatch.setattr(
@@ -71,9 +71,9 @@ def test_create_app_uses_metadata_helpers_by_default(
         response = client.get("/")
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"message": "SIC Vector Store API is running"}
-    assert app.title == "SIC Vector Store API"
-    assert app.description == "API for interacting with the SIC vector store"
+    assert response.json() == {"message": "Vector Store API is running"}
+    assert app.title == "Vector Store API"
+    assert app.description == "API for interacting with the vector store"
     assert app.version == "1.2.3"
 
 

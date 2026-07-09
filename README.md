@@ -110,7 +110,6 @@ script.
 
 | Variable               | Description                                                                    | Required            | Notes                                                                             |
 | ---------------------- | ------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------- |
-| KNOWLEDGEBASE_NAME     | Display name used in API metadata and the root status message                  | No                  | Usually `SIC` or `SOC`; defaults to `Example` if omitted                          |
 | VECTOR_STORE_DIR       | Directory or GCS URI for persisted vector-store artifacts                      | No                  | Defaults to `vector_store`; shared by the API and build script                    |
 | VECTOR_STORE_K_MATCHES | Maximum number of ranked matches returned per search request                   | No                  | Defaults to `20`                                                                  |
 | INDEX_SOURCE_FILE      | Local path or GCS URI for the source data used to build vector-store artifacts | Only for build step | Required by `make build-vector-store` / `scripts/build_vector_store_artifacts.py` |

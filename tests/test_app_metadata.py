@@ -1,7 +1,5 @@
 """Tests for application metadata helpers."""
 
-from types import SimpleNamespace
-
 import pytest
 
 from survey_assist_vector_store_api.api import app_metadata
@@ -24,16 +22,8 @@ def test_resolve_app_metadata_returns_explicit_overrides() -> None:
 
 
 @pytest.mark.api
-def test_resolve_app_metadata_fills_missing_values_from_settings(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify that missing metadata fields are derived from the knowledgebase."""
-    monkeypatch.setattr(
-        app_metadata,
-        "get_settings",
-        lambda: SimpleNamespace(knowledgebase_name="SIC"),
-    )
-
+def test_resolve_app_metadata_uses_generic_defaults_for_missing_values() -> None:
+    """Verify that missing metadata fields fall back to generic API defaults."""
     resolved_metadata = app_metadata.resolve_app_metadata(
         title=None,
         description="Custom description",
@@ -41,9 +31,9 @@ def test_resolve_app_metadata_fills_missing_values_from_settings(
     )
 
     assert resolved_metadata == (
-        "SIC Vector Store API",
+        app_metadata.DEFAULT_APP_TITLE,
         "Custom description",
-        "SIC Vector Store API is running",
+        app_metadata.DEFAULT_ROOT_MESSAGE,
     )
 
 
