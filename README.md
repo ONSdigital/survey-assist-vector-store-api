@@ -36,7 +36,6 @@ A generic vector store and api used by survey assist. This can deploy either an 
 - [License](#license)
 - [Maintainers](#maintainers)
 
-
 ## Features
 
 - FastAPI endpoints
@@ -105,12 +104,17 @@ http://localhost:8080/docs
 
 ## Configuration
 
-Add any environment variables here.
+Copy `.env.example` to `.env` and adjust values for your environment. The same
+`.env` file is used by the API runtime settings and the vector-store build
+script.
 
-| Variable | Description | Required | Notes |
-|-----------|-------------|----------|-------|
-| SOURCE_INDEX_FILE | The index used to build the vector store embeddings | No | Required to build embeddings |
-| VECTOR_STORE_DIR | The location of the built index | No | Default to data/vector_store in source |
+| Variable               | Description                                                                    | Required            | Notes                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------- |
+| KNOWLEDGEBASE_NAME     | Display name used in API metadata and the root status message                  | No                  | Usually `SIC` or `SOC`; defaults to `Example` if omitted                          |
+| VECTOR_STORE_DIR       | Directory or GCS URI for persisted vector-store artifacts                      | No                  | Defaults to `vector_store`; shared by the API and build script                    |
+| VECTOR_STORE_K_MATCHES | Maximum number of ranked matches returned per search request                   | No                  | Defaults to `20`                                                                  |
+| INDEX_SOURCE_FILE      | Local path or GCS URI for the source data used to build vector-store artifacts | Only for build step | Required by `make build-vector-store` / `scripts/build_vector_store_artifacts.py` |
+| EMBEDDING_MODEL_NAME   | Embedding model override for vector-store artifact generation                  | No                  | Defaults to the embed-core model if omitted                                       |
 
 ## Repository Structure
 
