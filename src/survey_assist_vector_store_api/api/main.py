@@ -1,5 +1,7 @@
 """FastAPI application entry point."""
 
+import traceback
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from survey_assist_utils.logging import get_logger
@@ -30,10 +32,11 @@ async def generic_error_handler(
     Returns:
         JSON response with status code 500 and an error detail message.
     """
-    logger.info(
+    logger.error(
         "Unexpected error",
         error=str(exc),
         error_type=type(exc).__name__,
+        traceback="".join(traceback.format_exception(exc)),
     )
 
     return JSONResponse(

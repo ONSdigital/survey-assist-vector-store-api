@@ -85,17 +85,20 @@ def test_generic_error_handler_returns_generic_500(
     logged_messages: list[tuple[str, dict[str, str]]] = []
     request = Request({"type": "http", "headers": []})
 
-    def fake_info(message: str, **kwargs: str) -> None:
+    def fake_error(message: str, **kwargs: str) -> None:
         logged_messages.append((message, kwargs))
 
-    monkeypatch.setattr(main_module.logger, "info", fake_info)
+    monkeypatch.setattr(main_module.logger, "error", fake_error)
 
     response = asyncio.run(
         main_module.generic_error_handler(request, RuntimeError("boom"))
     )
 
-    assert logged_messages == [
-        ("Unexpected error", {"error": "boom", "error_type": "RuntimeError"})
-    ]
+    assert len(logged_messages) == 1
+    message, kwargs = logged_messages[0]
+    assert message == "Unexpected error"
+    assert kwargs["error"] == "boom"
+    assert kwargs["error_type"] == "RuntimeError"
+    assert "RuntimeError: boom" in kwargs["traceback"]
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert response.body == b'{"detail":"An unexpected error occurred"}'
