@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from survey_assist_utils.logging import get_logger
 
 from survey_assist_vector_store_api.api.app_metadata import (
     resolve_app_metadata,
@@ -13,6 +14,7 @@ from survey_assist_vector_store_api.api.routes.search_index import (
 )
 
 DEFAULT_API_PREFIX = "/v1"
+logger = get_logger(__name__)
 
 
 async def generic_error_handler(
@@ -28,8 +30,11 @@ async def generic_error_handler(
     Returns:
         JSON response with status code 500 and an error detail message.
     """
-    # Replace with your project logger if required.
-    print(f"Unexpected error: {exc}")
+    logger.info(
+        "Unexpected error",
+        error=str(exc),
+        error_type=type(exc).__name__,
+    )
 
     return JSONResponse(
         status_code=500,

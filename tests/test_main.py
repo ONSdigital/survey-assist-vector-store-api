@@ -82,18 +82,20 @@ def test_generic_error_handler_returns_generic_500(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify that the generic exception handler returns the expected 500 body."""
-    printed: list[str] = []
+    logged_messages: list[tuple[str, dict[str, str]]] = []
     request = Request({"type": "http", "headers": []})
 
-    def fake_print(message: str) -> None:
-        printed.append(message)
+    def fake_info(message: str, **kwargs: str) -> None:
+        logged_messages.append((message, kwargs))
 
-    monkeypatch.setattr("builtins.print", fake_print)
+    monkeypatch.setattr(main_module.logger, "info", fake_info)
 
     response = asyncio.run(
         main_module.generic_error_handler(request, RuntimeError("boom"))
     )
 
-    assert printed == ["Unexpected error: boom"]
+    assert logged_messages == [
+        ("Unexpected error", {"error": "boom", "error_type": "RuntimeError"})
+    ]
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
     assert response.body == b'{"detail":"An unexpected error occurred"}'
