@@ -1,7 +1,5 @@
 """Build persisted vector-store artifacts for API deployments."""
 
-from __future__ import annotations
-
 import sys
 
 from pydantic import AliasChoices, Field
