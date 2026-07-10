@@ -15,6 +15,5 @@ async def vector_store_lifespan(_app: FastAPI) -> AsyncIterator[dict[str, object
     settings = get_settings()
     handler = build_embedding_handler(settings)
     yield {
-        "settings": settings,
         "embedding_handler": handler,
     }
