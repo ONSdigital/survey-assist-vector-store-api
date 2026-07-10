@@ -102,6 +102,10 @@ make run-vector-store
 
 http://localhost:8080/docs
 
+The OpenAPI description includes the installed package versions for
+`survey-assist-vector-store-api` and `survey-assist-embed-core`. Runtime
+embedding configuration is available from `GET /v1/runtime-config`.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and adjust values for your environment. The same

@@ -53,16 +53,12 @@ def test_create_app_uses_metadata_helpers_by_default(
     monkeypatch.setattr(
         main_module,
         "resolve_app_metadata",
-        lambda *, title, description, root_message: (
+        lambda *, title, description, root_message, version: (
             "Vector Store API",
-            "API for interacting with the vector store",
+            "API versions: api=1.2.3, embed_core=4.5.6",
             "Vector Store API is running",
+            "1.2.3",
         ),
-    )
-    monkeypatch.setattr(
-        main_module,
-        "resolve_default_version",
-        lambda: "1.2.3",
     )
 
     app = create_app()
@@ -73,7 +69,7 @@ def test_create_app_uses_metadata_helpers_by_default(
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"message": "Vector Store API is running"}
     assert app.title == "Vector Store API"
-    assert app.description == "API for interacting with the vector store"
+    assert app.description == "API versions: api=1.2.3, embed_core=4.5.6"
     assert app.version == "1.2.3"
 
 

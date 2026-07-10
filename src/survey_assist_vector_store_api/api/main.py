@@ -6,11 +6,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from survey_assist_utils.logging import get_logger
 
-from survey_assist_vector_store_api.api.app_metadata import (
-    resolve_app_metadata,
-    resolve_default_version,
-)
+from survey_assist_vector_store_api.api.app_metadata import resolve_app_metadata
 from survey_assist_vector_store_api.api.lifespan import vector_store_lifespan
+from survey_assist_vector_store_api.api.routes.runtime_config import (
+    router as runtime_config_router,
+)
 from survey_assist_vector_store_api.api.routes.search_index import (
     router as search_index_router,
 )
@@ -70,12 +70,17 @@ def create_app(
         FastAPI application configured with routes, exception handling, and a
         startup-loaded embedding handler.
     """
-    resolved_title, resolved_description, resolved_root_message = resolve_app_metadata(
+    (
+        resolved_title,
+        resolved_description,
+        resolved_root_message,
+        resolved_version,
+    ) = resolve_app_metadata(
         title=title,
         description=description,
         root_message=root_message,
+        version=version,
     )
-    resolved_version = version or resolve_default_version()
 
     def read_root() -> dict[str, str]:
         """Retrieve the root endpoint status message."""
@@ -90,6 +95,7 @@ def create_app(
 
     application.add_exception_handler(Exception, generic_error_handler)
     application.add_api_route("/", read_root, methods=["GET"])
+    application.include_router(runtime_config_router, prefix=api_prefix)
     application.include_router(search_index_router, prefix=api_prefix)
 
     return application
