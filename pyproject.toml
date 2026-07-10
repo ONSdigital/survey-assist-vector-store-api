@@ -2,14 +2,16 @@
 name = "survey-assist-vector-store-api"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Steve Gibbard",email = "steve.gibbard@ons.gov.uk"}
-]
+authors = [{ name = "Steve Gibbard", email = "steve.gibbard@ons.gov.uk" }]
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
     "fastapi (>=0.137.0,<0.138.0)",
-    "uvicorn[standard] (>=0.49.0,<0.50.0)"
+    "uvicorn[standard] (>=0.49.0,<0.50.0)",
+    "survey-assist-embed-core @ git+https://github.com/ONSdigital/survey-assist-embed-core@v0.2.0",
+    "pydantic (>=2.13.4,<3.0.0)",
+    "pydantic-settings (>=2.14.2,<3.0.0)",
+    "survey-assist-utils @ git+https://github.com/ONSdigital/survey-assist-utils.git@v0.0.8",
 ]
 
 
@@ -17,17 +19,19 @@ dependencies = [
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^9.1.0"
-bandit = "^1.9.4"
-ruff = "^0.15.17"
-mypy = "^2.1.0"
-pylint = "^4.0.6"
-mkdocs-material = "^9.7.6"
-pytest-cov = "^7.1.0"
-httpx2 = "^2.4.0"
-pre-commit = "^4.6.0"
-detect-secrets = "^1.5.0"
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.0,<10.0.0)",
+    "bandit (>=1.9.4,<2.0.0)",
+    "ruff (>=0.15.17,<0.16.0)",
+    "mypy (>=2.1.0,<3.0.0)",
+    "pylint (>=4.0.6,<5.0.0)",
+    "mkdocs-material (>=9.7.6,<10.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)",
+    "httpx2 (>=2.4.0,<3.0.0)",
+    "pre-commit (>=4.6.0,<5.0.0)",
+    "detect-secrets (>=1.5.0,<2.0.0)",
+]
 
 [tool.ruff]
 line-length = 88
@@ -40,18 +44,18 @@ select = [
 
     # Ruff rules: https://docs.astral.sh/ruff/rules/
 
-    "E",      # pycodestyle erros
-    "W",      # pycodestyle warnings
-    "F",      # Pyflakes
-    "UP",     # pyupgrade
-    "I",      # isort
-    "B",      # flake8-bugbear
-    "SIM",    # flake8-simplify
-    "C4",     # flake8-comprehensions
-    "S",      # flake8-bandit
-    "D",      # pydocstyle - Enforce existing docstrings only
-    "C90",    # mccabe
-    "RUF",    # Ruff specific rules
+    "E",   # pycodestyle erros
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "UP",  # pyupgrade
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "C4",  # flake8-comprehensions
+    "S",   # flake8-bandit
+    "D",   # pydocstyle - Enforce existing docstrings only
+    "C90", # mccabe
+    "RUF", # Ruff specific rules
 
     # PL - Pylint is only partially supported, we also use the pylint tool to catch all the rules.
     # It is enabled here to take advantage of the ruff's speed.
@@ -62,7 +66,14 @@ ignore = [
     # Conflicts with google docstring style
     "D205",
     # Allow missing docstring, remove to enforce docstrings across the board
-    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
     # Disable line length check as it is handled by black
     # :TODO: Remove E501 when ruff supports all black rules
     "E501",
@@ -84,13 +95,8 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.coverage.run]
-source = ["src"]
-omit = [
-    "*/tests/*",
-    "*/cicd/*",
-    "*/scripts/*",
-    "*/docs/*",
-]
+source = ["src", "scripts"]
+omit = ["*/tests/*", "*/cicd/*", "*/docs/*"]
 
 [tool.coverage.report]
 show_missing = true
