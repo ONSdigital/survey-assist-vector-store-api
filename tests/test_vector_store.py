@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 
 from survey_assist_vector_store_api.api.deps import vector_store as vector_store_module
-from survey_assist_vector_store_api.api.deps.settings import VectorStoreApiSettings
+from survey_assist_vector_store_api.api.deps.settings import RuntimeVectorStoreSettings
 
 
 class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
@@ -25,7 +25,7 @@ def test_build_embedding_handler_uses_settings(
     """Verify that the concrete builder wires settings into the handler."""
     backend_marker = object()
     expected_k_matches = 12
-    settings = VectorStoreApiSettings(
+    settings = RuntimeVectorStoreSettings(
         vector_store_dir="sic-store",
         vector_store_k_matches=expected_k_matches,
     )
@@ -41,7 +41,7 @@ def test_build_embedding_handler_uses_settings(
         FakeEmbeddingHandler,
     )
 
-    handler = vector_store_module.build_embedding_handler(settings)
+    handler = vector_store_module.load_embedding_handler(settings)
 
     assert isinstance(handler, FakeEmbeddingHandler)
     assert vars(handler) == {

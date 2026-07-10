@@ -5,7 +5,7 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class VectorStoreApiSettings(BaseSettings):
+class RuntimeVectorStoreSettings(BaseSettings):
     """Runtime configuration for the vector-store API.
 
     Attributes:
@@ -26,6 +26,6 @@ class VectorStoreApiSettings(BaseSettings):
 
 
 @lru_cache(maxsize=1)
-def get_settings() -> VectorStoreApiSettings:
+def get_settings() -> RuntimeVectorStoreSettings:
     """Return cached application settings loaded from environment variables."""
-    return VectorStoreApiSettings()
+    return RuntimeVectorStoreSettings()

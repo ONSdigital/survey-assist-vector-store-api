@@ -3,7 +3,7 @@
 import pytest
 
 from survey_assist_vector_store_api.api.deps.settings import (
-    VectorStoreApiSettings,
+    RuntimeVectorStoreSettings,
     get_settings,
 )
 
@@ -21,11 +21,11 @@ def test_settings_validate_field_names_and_uppercase_env_vars(
     monkeypatch.setenv("VECTOR_STORE_DIR", "soc-store")
     monkeypatch.setenv("VECTOR_STORE_K_MATCHES", str(by_env_matches))
 
-    settings_by_name = VectorStoreApiSettings(
+    settings_by_name = RuntimeVectorStoreSettings(
         vector_store_dir="sic-store",
         vector_store_k_matches=by_name_matches,
     )
-    settings_by_env = VectorStoreApiSettings()
+    settings_by_env = RuntimeVectorStoreSettings()
 
     assert settings_by_name.vector_store_dir == "sic-store"
     assert settings_by_name.vector_store_k_matches == by_name_matches

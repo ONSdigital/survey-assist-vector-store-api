@@ -77,7 +77,7 @@ def test_search_index_route_validates_query_payload(
 
 
 @pytest.mark.api
-def test_create_app_builds_handler_on_startup(
+def test_create_app_loads_handler_on_startup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify that the concrete app constructs the handler during startup."""
@@ -88,15 +88,15 @@ def test_create_app_builds_handler_on_startup(
     def fake_get_settings() -> object:
         return settings_marker
 
-    def fake_build_embedding_handler(settings: object) -> FakeEmbeddingHandler:
+    def fake_load_embedding_handler(settings: object) -> FakeEmbeddingHandler:
         seen_settings.append(settings)
         return fake_handler
 
     monkeypatch.setattr(lifespan_module, "get_settings", fake_get_settings)
     monkeypatch.setattr(
         lifespan_module,
-        "build_embedding_handler",
-        fake_build_embedding_handler,
+        "load_embedding_handler",
+        fake_load_embedding_handler,
     )
 
     app = create_app()
