@@ -1,15 +1,11 @@
 """Tests for the search-index route."""
 
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-
 import pytest
-from fastapi import FastAPI, status
+from fastapi import status
 from fastapi.testclient import TestClient
 from survey_assist_embed_core.models import SearchIndexItem, SearchIndexResponse
 
 from survey_assist_vector_store_api.api import lifespan as lifespan_module
-from survey_assist_vector_store_api.api import main as main_module
 from survey_assist_vector_store_api.api.main import create_app
 
 
@@ -37,18 +33,11 @@ class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
 
 @pytest.mark.api
 def test_search_index_route_uses_handler_from_request_state(
-    monkeypatch: pytest.MonkeyPatch,
+    create_app_with_handler,
 ) -> None:
     """Verify that the route reads the startup-loaded handler from request state."""
     fake_handler = FakeEmbeddingHandler()
-
-    @asynccontextmanager
-    async def lifespan_context(_app: FastAPI) -> AsyncIterator[dict[str, object]]:
-        yield {"embedding_handler": fake_handler}
-
-    monkeypatch.setattr(main_module, "vector_store_lifespan", lifespan_context)
-
-    app = create_app()
+    app = create_app_with_handler(fake_handler)
 
     with TestClient(app) as client:
         response = client.post(
@@ -71,18 +60,11 @@ def test_search_index_route_uses_handler_from_request_state(
 
 @pytest.mark.api
 def test_search_index_route_validates_query_payload(
-    monkeypatch: pytest.MonkeyPatch,
+    create_app_with_handler,
 ) -> None:
     """Verify that malformed request payloads are rejected by FastAPI."""
     fake_handler = FakeEmbeddingHandler()
-
-    @asynccontextmanager
-    async def lifespan_context(_app: FastAPI) -> AsyncIterator[dict[str, object]]:
-        yield {"embedding_handler": fake_handler}
-
-    monkeypatch.setattr(main_module, "vector_store_lifespan", lifespan_context)
-
-    app = create_app()
+    app = create_app_with_handler(fake_handler)
 
     with TestClient(app) as client:
         response = client.post(

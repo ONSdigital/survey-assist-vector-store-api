@@ -43,9 +43,9 @@ def test_build_default_app_description_includes_package_versions() -> None:
 
     assert description == (
         "API for interacting with the vector store\n\n"
-        "Package versions:\n"
-        "- survey-assist-vector-store-api: 1.2.3\n"
-        "- survey-assist-embed-core: 4.5.6"
+        "### Package versions:\n"
+        "- survey-assist-vector-store-api: `1.2.3`\n"
+        "- survey-assist-embed-core: `4.5.6`"
     )
 
 
@@ -92,7 +92,7 @@ def test_resolve_installed_version_uses_package_metadata(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify that installed package metadata is used when available."""
-    monkeypatch.setattr(app_metadata, "version", lambda _name: "1.2.3")
+    monkeypatch.setattr(app_metadata.metadata, "version", lambda _name: "1.2.3")
 
     assert app_metadata.resolve_installed_version("any-package") == "1.2.3"
 
@@ -104,10 +104,10 @@ def test_resolve_installed_version_falls_back_when_package_is_missing(
     """Verify that missing package metadata falls back to unknown."""
 
     def _raise_package_not_found(_name: str) -> str:
-        raise app_metadata.PackageNotFoundError
+        raise app_metadata.metadata.PackageNotFoundError
 
     monkeypatch.setattr(
-        app_metadata,
+        app_metadata.metadata,
         "version",
         _raise_package_not_found,
     )

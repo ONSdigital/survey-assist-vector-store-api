@@ -1,15 +1,9 @@
 """Tests for the runtime-config route."""
 
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-
 import pytest
-from fastapi import FastAPI, status
+from fastapi import status
 from fastapi.testclient import TestClient
 from survey_assist_embed_core.models import EmbeddingStatus, VectorBackendConfig
-
-from survey_assist_vector_store_api.api import main as main_module
-from survey_assist_vector_store_api.api.main import create_app
 
 
 class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
@@ -40,18 +34,11 @@ class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
 
 @pytest.mark.api
 def test_runtime_config_route_returns_handler_configuration(
-    monkeypatch: pytest.MonkeyPatch,
+    create_app_with_handler,
 ) -> None:
     """Verify that the route returns the loaded handler runtime config."""
     fake_handler = FakeEmbeddingHandler()
-
-    @asynccontextmanager
-    async def lifespan_context(_app: FastAPI) -> AsyncIterator[dict[str, object]]:
-        yield {"embedding_handler": fake_handler}
-
-    monkeypatch.setattr(main_module, "vector_store_lifespan", lifespan_context)
-
-    app = create_app()
+    app = create_app_with_handler(fake_handler)
 
     with TestClient(app) as client:
         response = client.get("/v1/runtime-config")

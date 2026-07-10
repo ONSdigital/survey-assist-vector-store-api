@@ -1,6 +1,6 @@
 """Helpers for application metadata and version resolution."""
 
-from importlib.metadata import PackageNotFoundError, version
+from importlib import metadata
 
 PACKAGE_DISTRIBUTION_NAME = "survey-assist-vector-store-api"
 EMBED_CORE_PACKAGE_DISTRIBUTION_NAME = "survey-assist-embed-core"
@@ -48,8 +48,8 @@ def resolve_app_metadata(
 def resolve_installed_version(package_distribution_name: str) -> str:
     """Resolve an installed package version from distribution metadata."""
     try:
-        return version(package_distribution_name)
-    except PackageNotFoundError:
+        return metadata.version(package_distribution_name)
+    except metadata.PackageNotFoundError:
         return UNKNOWN_PACKAGE_VERSION
 
 
