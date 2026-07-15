@@ -100,6 +100,7 @@ def test_script_runs_main_when_executed_as_main_module(
         """Minimal fake builder for the script under test."""
 
         def build_artifact(self, output_dir: str, *, overwrite: bool = False) -> None:
+            """Record build invocations for assertion."""
             build_calls.append((output_dir, overwrite))
 
     class FakeBuilderFactory:  # pylint: disable=too-few-public-methods
@@ -107,6 +108,7 @@ def test_script_runs_main_when_executed_as_main_module(
 
         @classmethod
         def from_csv(cls, file_path: str, **kwargs: object) -> FakeBuilder:
+            """Record builder construction inputs and return a fake builder."""
             builder_calls.append({"file_path": file_path, **kwargs})
             return FakeBuilder()
 
@@ -152,6 +154,7 @@ def test_main_uses_cli_arguments(
         """Minimal fake builder for the script under test."""
 
         def build_artifact(self, output_dir: str, *, overwrite: bool = False) -> None:
+            """Record build invocations for assertion."""
             build_calls.append((output_dir, overwrite))
 
     class FakeBuilderFactory:  # pylint: disable=too-few-public-methods
@@ -159,6 +162,7 @@ def test_main_uses_cli_arguments(
 
         @classmethod
         def from_csv(cls, file_path: str, **kwargs: object) -> FakeBuilder:
+            """Record builder construction inputs and return a fake builder."""
             builder_calls.append({"file_path": file_path, **kwargs})
             return FakeBuilder()
 
@@ -209,6 +213,7 @@ def test_main_uses_environment_defaults(
         """Minimal fake builder for the script under test."""
 
         def build_artifact(self, output_dir: str, *, overwrite: bool = False) -> None:
+            """Record build invocations for assertion."""
             build_calls.append((output_dir, overwrite))
 
     class FakeBuilderFactory:  # pylint: disable=too-few-public-methods
@@ -216,6 +221,7 @@ def test_main_uses_environment_defaults(
 
         @classmethod
         def from_csv(cls, file_path: str, **kwargs: object) -> FakeBuilder:
+            """Record builder construction inputs and return a fake builder."""
             builder_calls.append({"file_path": file_path, **kwargs})
             return FakeBuilder()
 

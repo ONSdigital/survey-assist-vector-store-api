@@ -20,6 +20,7 @@ def test_load_suggester_uses_settings(monkeypatch: pytest.MonkeyPatch) -> None:
 
         @classmethod
         def from_artifact(cls, artifact_dir: str) -> object:
+            """Record the artifact path and return the configured suggester."""
             loaded_paths.append(artifact_dir)
             return expected_suggester
 

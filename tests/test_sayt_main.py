@@ -48,9 +48,10 @@ def test_create_app_applies_overrides_to_app_and_root_route() -> None:
 def test_generic_error_handler_returns_generic_500(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Verify that the generic exception handler returns the expected 500 body."""
+    """Verify that create_app registers the expected generic 500 handler."""
     logged_messages: list[tuple[str, dict[str, str]]] = []
     request = Request({"type": "http", "headers": []})
+    app = create_app()
 
     def fake_error(message: str, **kwargs: str) -> None:
         logged_messages.append((message, kwargs))
@@ -58,7 +59,7 @@ def test_generic_error_handler_returns_generic_500(
     monkeypatch.setattr(main_module.logger, "error", fake_error)
 
     response = asyncio.run(
-        main_module.generic_error_handler(request, RuntimeError("boom"))
+        app.exception_handlers[Exception](request, RuntimeError("boom"))
     )
 
     assert len(logged_messages) == 1
