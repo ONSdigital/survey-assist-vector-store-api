@@ -1,104 +1,56 @@
 """Tests for application metadata helpers."""
 
+import importlib
+
 import pytest
 
-from survey_assist_vector_store_api.api import app_metadata
+from survey_assist_vector_store_api.shared import app_metadata
 
-
-@pytest.mark.api
-def test_resolve_app_metadata_returns_explicit_overrides(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify that explicit metadata overrides are returned unchanged."""
-    monkeypatch.setattr(
-        app_metadata,
-        "resolve_installed_version",
-        lambda _package_distribution_name: pytest.fail(
-            "resolve_installed_version should not be used for explicit overrides"
-        ),
-    )
-
-    resolved_metadata = app_metadata.resolve_app_metadata(
-        title="Custom API",
-        description="Custom description",
-        root_message="Custom API is running",
-        version="9.9.9",
-    )
-
-    assert resolved_metadata == (
-        "Custom API",
-        "Custom description",
-        "Custom API is running",
-        "9.9.9",
-    )
+DEFAULT_DESCRIPTION = "API for interacting with the vector store"
 
 
 @pytest.mark.api
 def test_build_default_app_description_includes_package_versions() -> None:
     """Verify that the default docs description includes both package versions."""
     description = app_metadata.build_default_app_description(
-        api_version="1.2.3",
-        embed_core_version="4.5.6",
+        description=DEFAULT_DESCRIPTION,
     )
 
     assert description == (
         "API for interacting with the vector store\n\n"
         "### Package versions:\n"
-        "- survey-assist-vector-store-api: `1.2.3`\n"
-        "- survey-assist-embed-core: `4.5.6`"
+        f"- survey-assist-vector-store-api: `{app_metadata.API_PACKAGE_VERSION}`\n"
+        f"- survey-assist-embed-core: `{app_metadata.EMBED_CORE_PACKAGE_VERSION}`"
     )
 
 
 @pytest.mark.api
-def test_resolve_app_metadata_uses_versioned_default_description() -> None:
-    """Verify that missing metadata fields fall back to versioned defaults."""
-    versions = {
-        app_metadata.PACKAGE_DISTRIBUTION_NAME: "1.2.3",
-        app_metadata.EMBED_CORE_PACKAGE_DISTRIBUTION_NAME: "4.5.6",
-    }
-
-    def _resolve_installed_version(package_distribution_name: str) -> str:
-        return versions[package_distribution_name]
-
-    monkeypatch = pytest.MonkeyPatch()
-    monkeypatch.setattr(
-        app_metadata,
-        "resolve_installed_version",
-        _resolve_installed_version,
-    )
-
-    resolved_metadata = app_metadata.resolve_app_metadata(
-        title=None,
-        description=None,
-        root_message=None,
-        version=None,
-    )
-
-    monkeypatch.undo()
-
-    assert resolved_metadata == (
-        app_metadata.DEFAULT_APP_TITLE,
-        app_metadata.build_default_app_description(
-            api_version="1.2.3",
-            embed_core_version="4.5.6",
-        ),
-        app_metadata.DEFAULT_ROOT_MESSAGE,
-        "1.2.3",
-    )
-
-
-@pytest.mark.api
-def test_resolve_installed_version_uses_package_metadata(
+def test_module_resolves_package_versions_at_import_time(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Verify that installed package metadata is used when available."""
-    monkeypatch.setattr(app_metadata.metadata, "version", lambda _name: "1.2.3")
+    """Verify that version constants are resolved when the module is imported."""
+    seen_names: list[str] = []
 
-    assert app_metadata.resolve_installed_version("any-package") == "1.2.3"
+    def fake_version(name: str) -> str:
+        seen_names.append(name)
+        return {
+            "survey-assist-vector-store-api": "1.2.3",
+            "survey-assist-embed-core": "4.5.6",
+        }[name]
+
+    monkeypatch.setattr(app_metadata.metadata, "version", fake_version)
+    reloaded_module = importlib.reload(app_metadata)
+
+    assert reloaded_module.API_PACKAGE_VERSION == "1.2.3"
+    assert reloaded_module.EMBED_CORE_PACKAGE_VERSION == "4.5.6"
+    assert seen_names == [
+        "survey-assist-vector-store-api",
+        "survey-assist-embed-core",
+    ]
 
 
 @pytest.mark.api
-def test_resolve_installed_version_falls_back_when_package_is_missing(
+def test_module_falls_back_when_package_metadata_is_missing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify that missing package metadata falls back to unknown."""
@@ -106,10 +58,8 @@ def test_resolve_installed_version_falls_back_when_package_is_missing(
     def _raise_package_not_found(_name: str) -> str:
         raise app_metadata.metadata.PackageNotFoundError
 
-    monkeypatch.setattr(
-        app_metadata.metadata,
-        "version",
-        _raise_package_not_found,
-    )
+    monkeypatch.setattr(app_metadata.metadata, "version", _raise_package_not_found)
+    reloaded_module = importlib.reload(app_metadata)
 
-    assert app_metadata.resolve_installed_version("any-package") == "unknown"
+    assert reloaded_module.API_PACKAGE_VERSION == "unknown"
+    assert reloaded_module.EMBED_CORE_PACKAGE_VERSION == "unknown"

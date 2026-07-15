@@ -5,8 +5,8 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from survey_assist_embed_core.models import SearchIndexItem, SearchIndexResponse
 
-from survey_assist_vector_store_api.api import lifespan as lifespan_module
-from survey_assist_vector_store_api.api.main import create_app
+from survey_assist_vector_store_api.vector_search_api import lifespan as lifespan_module
+from survey_assist_vector_store_api.vector_search_api.main import create_app
 
 
 class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods

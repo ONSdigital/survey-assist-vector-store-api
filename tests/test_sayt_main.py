@@ -1,4 +1,4 @@
-"""Tests for the main FastAPI application."""
+"""Tests for the SAYT FastAPI application."""
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -7,66 +7,41 @@ import pytest
 from fastapi import FastAPI, Request, status
 from fastapi.testclient import TestClient
 
-from survey_assist_vector_store_api.vector_search_api import main as main_module
-from survey_assist_vector_store_api.vector_search_api.main import create_app
+from survey_assist_vector_store_api.sayt_api import main as main_module
+from survey_assist_vector_store_api.sayt_api.main import create_app
 
 
-@pytest.fixture(name="fake_lifespan")
-def fake_lifespan_fixture(monkeypatch: pytest.MonkeyPatch):
-    """Patch the concrete app lifespan so tests do not load a real vector store."""
+@pytest.fixture(name="fake_sayt_lifespan")
+def fake_sayt_lifespan_fixture(monkeypatch: pytest.MonkeyPatch):
+    """Patch the concrete SAYT lifespan so tests do not load a real artifact."""
 
     async def _empty_lifespan(_app: FastAPI):
         yield {}
 
     patched_lifespan = asynccontextmanager(_empty_lifespan)
-    monkeypatch.setattr(main_module, "vector_store_lifespan", patched_lifespan)
+    monkeypatch.setattr(main_module, "sayt_lifespan", patched_lifespan)
     return patched_lifespan
 
 
 @pytest.mark.api
-@pytest.mark.usefixtures("fake_lifespan")
+@pytest.mark.usefixtures("fake_sayt_lifespan")
 def test_create_app_applies_overrides_to_app_and_root_route() -> None:
     """Verify that create_app applies configuration overrides to the app."""
     app = create_app(
-        title="Test API",
-        description="Test description",
+        title="Test SAYT API",
+        description="Test SAYT description",
         version="9.9.9",
-        root_message="Test API is running",
+        root_message="Test SAYT API is running",
     )
 
     with TestClient(app) as client:
         response = client.get("/")
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"message": "Test API is running"}
-    assert app.title == "Test API"
-    assert app.description == "Test description"
+    assert response.json() == {"message": "Test SAYT API is running"}
+    assert app.title == "Test SAYT API"
+    assert app.description == "Test SAYT description"
     assert app.version == "9.9.9"
-
-
-@pytest.mark.api
-@pytest.mark.usefixtures("fake_lifespan")
-def test_create_app_uses_metadata_helpers_by_default(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify that create_app delegates default metadata and version resolution."""
-    monkeypatch.setattr(
-        main_module,
-        "build_default_app_description",
-        lambda *, description: "API versions: api=1.2.3, embed_core=4.5.6",
-    )
-    monkeypatch.setattr(main_module, "API_PACKAGE_VERSION", "1.2.3")
-
-    app = create_app()
-
-    with TestClient(app) as client:
-        response = client.get("/")
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"message": "Vector Store API is running"}
-    assert app.title == "Vector Store API"
-    assert app.description == "API versions: api=1.2.3, embed_core=4.5.6"
-    assert app.version == "1.2.3"
 
 
 @pytest.mark.api

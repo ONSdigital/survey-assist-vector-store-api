@@ -4,8 +4,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from survey_assist_vector_store_api.api.deps import vector_store as vector_store_module
-from survey_assist_vector_store_api.api.deps.settings import RuntimeVectorStoreSettings
+from survey_assist_vector_store_api.vector_search_api.deps import (
+    vector_store as vector_store_module,
+)
+from survey_assist_vector_store_api.vector_search_api.deps.settings import (
+    RuntimeVectorStoreSettings,
+)
 
 
 class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
