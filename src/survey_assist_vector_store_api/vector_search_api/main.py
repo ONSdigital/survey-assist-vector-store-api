@@ -1,13 +1,13 @@
 """FastAPI application entry point."""
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from survey_assist_utils.logging import get_logger
 
 from survey_assist_vector_store_api.shared.app_metadata import (
     API_PACKAGE_VERSION,
     build_default_app_description,
 )
-from survey_assist_vector_store_api.shared.http import build_generic_error_response
+from survey_assist_vector_store_api.shared.http import build_generic_error_handler
 from survey_assist_vector_store_api.vector_search_api.lifespan import (
     vector_store_lifespan,
 )
@@ -23,22 +23,6 @@ DEFAULT_APP_TITLE = "Vector Store API"
 DEFAULT_APP_DESCRIPTION = "API for interacting with the vector store"
 DEFAULT_ROOT_MESSAGE = "Vector Store API is running"
 logger = get_logger(__name__)
-
-
-async def generic_error_handler(
-    _request: Request,
-    exc: Exception,
-) -> object:
-    """Handle unhandled exceptions with a generic error response.
-
-    Args:
-        _request: The HTTP request that triggered the exception (unused).
-        exc: The exception instance that was raised.
-
-    Returns:
-        JSON response with status code 500 and an error detail message.
-    """
-    return build_generic_error_response(logger, exc)
 
 
 def create_app(
@@ -84,6 +68,7 @@ def create_app(
         lifespan=vector_store_lifespan,
     )
 
+    generic_error_handler = build_generic_error_handler(logger)
     application.add_exception_handler(Exception, generic_error_handler)
     application.add_api_route("/", read_root, methods=["GET"])
     application.include_router(runtime_config_router, prefix=api_prefix)
