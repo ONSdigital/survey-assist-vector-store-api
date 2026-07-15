@@ -1,28 +1,34 @@
 """FastAPI application entry point."""
 
-import traceback
-
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 from survey_assist_utils.logging import get_logger
 
-from survey_assist_vector_store_api.api.app_metadata import resolve_app_metadata
-from survey_assist_vector_store_api.api.lifespan import vector_store_lifespan
-from survey_assist_vector_store_api.api.routes.runtime_config import (
+from survey_assist_vector_store_api.shared.app_metadata import (
+    API_PACKAGE_VERSION,
+    build_default_app_description,
+)
+from survey_assist_vector_store_api.shared.http import build_generic_error_response
+from survey_assist_vector_store_api.vector_search_api.lifespan import (
+    vector_store_lifespan,
+)
+from survey_assist_vector_store_api.vector_search_api.routes.runtime_config import (
     router as runtime_config_router,
 )
-from survey_assist_vector_store_api.api.routes.search_index import (
+from survey_assist_vector_store_api.vector_search_api.routes.search_index import (
     router as search_index_router,
 )
 
 DEFAULT_API_PREFIX = "/v1"
+DEFAULT_APP_TITLE = "Vector Store API"
+DEFAULT_APP_DESCRIPTION = "API for interacting with the vector store"
+DEFAULT_ROOT_MESSAGE = "Vector Store API is running"
 logger = get_logger(__name__)
 
 
 async def generic_error_handler(
     _request: Request,
     exc: Exception,
-) -> JSONResponse:
+) -> object:
     """Handle unhandled exceptions with a generic error response.
 
     Args:
@@ -32,17 +38,7 @@ async def generic_error_handler(
     Returns:
         JSON response with status code 500 and an error detail message.
     """
-    logger.error(
-        "Unexpected error",
-        error=str(exc),
-        error_type=type(exc).__name__,
-        traceback="".join(traceback.format_exception(exc)),
-    )
-
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "An unexpected error occurred"},
-    )
+    return build_generic_error_response(logger, exc)
 
 
 def create_app(
@@ -70,17 +66,12 @@ def create_app(
         FastAPI application configured with routes, exception handling, and a
         startup-loaded embedding handler.
     """
-    (
-        resolved_title,
-        resolved_description,
-        resolved_root_message,
-        resolved_version,
-    ) = resolve_app_metadata(
-        title=title,
-        description=description,
-        root_message=root_message,
-        version=version,
+    resolved_title = title or DEFAULT_APP_TITLE
+    resolved_description = description or build_default_app_description(
+        description=DEFAULT_APP_DESCRIPTION,
     )
+    resolved_root_message = root_message or DEFAULT_ROOT_MESSAGE
+    resolved_version = version or API_PACKAGE_VERSION
 
     def read_root() -> dict[str, str]:
         """Retrieve the root endpoint status message."""

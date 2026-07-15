@@ -5,7 +5,9 @@ from typing import cast
 from fastapi import Request
 from survey_assist_embed_core import ClassifaiVectorBackend, EmbeddingHandler
 
-from survey_assist_vector_store_api.api.deps.settings import RuntimeVectorStoreSettings
+from survey_assist_vector_store_api.vector_search_api.deps.settings import (
+    RuntimeVectorStoreSettings,
+)
 
 
 def load_embedding_handler(settings: RuntimeVectorStoreSettings) -> EmbeddingHandler:

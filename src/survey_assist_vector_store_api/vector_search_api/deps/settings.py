@@ -8,19 +8,13 @@ from survey_assist_embed_core.adapters.classifai.vector_backend import (
     DEFAULT_CLASSIFAI_EMBEDDING_MODEL_NAME,
 )
 
+from survey_assist_vector_store_api.shared.build_settings import BaseBuildSettings
+
 DEFAULT_VECTOR_STORE_DIR = "vector_store"
 
 
-class BuildVectorStoreSettings(BaseSettings):
+class BuildVectorStoreSettings(BaseBuildSettings):
     """Settings for building persisted vector-store artifacts."""
-
-    model_config = SettingsConfigDict(
-        cli_parse_args=True,
-        cli_kebab_case=True,
-        extra="ignore",
-        populate_by_name=True,
-        env_file=".env",
-    )
 
     index_source_file: str | None = Field(
         default=None,

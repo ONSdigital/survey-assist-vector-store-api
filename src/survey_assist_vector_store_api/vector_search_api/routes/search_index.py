@@ -6,8 +6,12 @@ from fastapi import APIRouter, Depends
 from survey_assist_embed_core import EmbeddingHandler
 from survey_assist_embed_core.models import SearchIndexResponse
 
-from survey_assist_vector_store_api.api.deps.vector_store import get_embedding_handler
-from survey_assist_vector_store_api.api.models.search_index import SearchIndexRequest
+from survey_assist_vector_store_api.vector_search_api.deps.vector_store import (
+    get_embedding_handler,
+)
+from survey_assist_vector_store_api.vector_search_api.models.search_index import (
+    SearchIndexRequest,
+)
 
 router = APIRouter(tags=["search"])
 
