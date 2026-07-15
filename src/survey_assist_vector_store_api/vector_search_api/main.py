@@ -1,13 +1,12 @@
-"""FastAPI application entry point."""
+"""FastAPI application entry point."""  # pylint: disable=duplicate-code
 
-from fastapi import FastAPI
 from survey_assist_utils.logging import get_logger
 
 from survey_assist_vector_store_api.shared.app_metadata import (
     API_PACKAGE_VERSION,
     build_default_app_description,
 )
-from survey_assist_vector_store_api.shared.http import build_generic_error_handler
+from survey_assist_vector_store_api.shared.fastapi_app import AppMetadata, create_app
 from survey_assist_vector_store_api.vector_search_api.lifespan import (
     vector_store_lifespan,
 )
@@ -22,59 +21,20 @@ DEFAULT_API_PREFIX = "/v1"
 DEFAULT_APP_TITLE = "Vector Store API"
 DEFAULT_APP_DESCRIPTION = "API for interacting with the vector store"
 DEFAULT_ROOT_MESSAGE = "Vector Store API is running"
+DEFAULT_APP_METADATA = AppMetadata(
+    title=DEFAULT_APP_TITLE,
+    description=build_default_app_description(description=DEFAULT_APP_DESCRIPTION),
+    version=API_PACKAGE_VERSION,
+    root_message=DEFAULT_ROOT_MESSAGE,
+)
+
 logger = get_logger(__name__)
 
 
-def create_app(
-    *,
-    title: str | None = None,
-    description: str | None = None,
-    version: str | None = None,
-    root_message: str | None = None,
-    api_prefix: str = DEFAULT_API_PREFIX,
-) -> FastAPI:
-    """Create the vector-store API application.
-
-    Args:
-        title: Application title for API documentation. When omitted, a
-            generic API default is used.
-        description: Application description for API documentation. When
-            omitted, a generic API default is used.
-        version: Application version for API documentation. When omitted, the
-            installed package version is used.
-        root_message: Message returned by the root endpoint. When omitted, a
-            generic API default is used.
-        api_prefix: URL prefix for included API routers.
-
-    Returns:
-        FastAPI application configured with routes, exception handling, and a
-        startup-loaded embedding handler.
-    """
-    resolved_title = title or DEFAULT_APP_TITLE
-    resolved_description = description or build_default_app_description(
-        description=DEFAULT_APP_DESCRIPTION,
-    )
-    resolved_root_message = root_message or DEFAULT_ROOT_MESSAGE
-    resolved_version = version or API_PACKAGE_VERSION
-
-    def read_root() -> dict[str, str]:
-        """Retrieve the root endpoint status message."""
-        return {"message": resolved_root_message}
-
-    application = FastAPI(
-        title=resolved_title,
-        description=resolved_description,
-        version=resolved_version,
-        lifespan=vector_store_lifespan,
-    )
-
-    generic_error_handler = build_generic_error_handler(logger)
-    application.add_exception_handler(Exception, generic_error_handler)
-    application.add_api_route("/", read_root, methods=["GET"])
-    application.include_router(runtime_config_router, prefix=api_prefix)
-    application.include_router(search_index_router, prefix=api_prefix)
-
-    return application
-
-
-app = create_app()
+app = create_app(
+    metadata=DEFAULT_APP_METADATA,
+    api_prefix=DEFAULT_API_PREFIX,
+    lifespan=vector_store_lifespan,
+    routers=(runtime_config_router, search_index_router),
+    logger=logger,
+)

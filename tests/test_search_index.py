@@ -6,7 +6,8 @@ from fastapi.testclient import TestClient
 from survey_assist_embed_core.models import SearchIndexItem, SearchIndexResponse
 
 from survey_assist_vector_store_api.vector_search_api import lifespan as lifespan_module
-from survey_assist_vector_store_api.vector_search_api.main import create_app
+from survey_assist_vector_store_api.vector_search_api import main as main_module
+from tests.helpers import create_test_app
 
 
 class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
@@ -99,7 +100,10 @@ def test_create_app_loads_handler_on_startup(
         fake_load_embedding_handler,
     )
 
-    app = create_app()
+    app = create_test_app(
+        main_module,
+        lifespan=main_module.vector_store_lifespan,
+    )
 
     with TestClient(app) as client:
         response = client.post("/v1/search-index", json={"query": ["developer"]})

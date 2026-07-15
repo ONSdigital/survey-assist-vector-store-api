@@ -6,8 +6,13 @@ from collections.abc import Awaitable, Callable
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
+from survey_assist_vector_store_api.shared.types import StructuredLogger
 
-def build_generic_error_response(logger, exc: Exception) -> JSONResponse:
+
+def build_generic_error_response(
+    logger: StructuredLogger,
+    exc: Exception,
+) -> JSONResponse:
     """Log an unexpected exception and return a generic 500 response."""
     logger.error(
         "Unexpected error",
@@ -23,7 +28,7 @@ def build_generic_error_response(logger, exc: Exception) -> JSONResponse:
 
 
 def build_generic_error_handler(
-    logger,
+    logger: StructuredLogger,
 ) -> Callable[[Request, Exception], Awaitable[JSONResponse]]:
     """Return a FastAPI-compatible exception handler bound to a logger."""
 

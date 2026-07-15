@@ -7,9 +7,8 @@ import pytest
 from fastapi import FastAPI
 
 from survey_assist_vector_store_api.sayt_api import main as sayt_main_module
-from survey_assist_vector_store_api.sayt_api.main import create_app as create_sayt_app
 from survey_assist_vector_store_api.vector_search_api import main as main_module
-from survey_assist_vector_store_api.vector_search_api.main import create_app
+from tests.helpers import create_test_app
 
 
 @pytest.fixture(name="create_app_with_handler")
@@ -26,7 +25,10 @@ def create_app_with_handler_fixture(
             yield {"embedding_handler": handler}
 
         monkeypatch.setattr(main_module, "vector_store_lifespan", lifespan_context)
-        return create_app()
+        return create_test_app(
+            main_module,
+            lifespan=main_module.vector_store_lifespan,
+        )
 
     return _create_app_with_handler
 
@@ -45,6 +47,9 @@ def create_sayt_app_with_suggester_fixture(
             yield {"suggester": suggester}
 
         monkeypatch.setattr(sayt_main_module, "sayt_lifespan", lifespan_context)
-        return create_sayt_app()
+        return create_test_app(
+            sayt_main_module,
+            lifespan=sayt_main_module.sayt_lifespan,
+        )
 
     return _create_sayt_app_with_suggester

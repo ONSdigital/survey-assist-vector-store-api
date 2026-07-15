@@ -1,12 +1,11 @@
 """Tests for the SAYT artifact build script."""
 
-import importlib.util
-import runpy
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+from tests.helpers import load_script_module, run_script_as_main, set_script_argv
 
 SCRIPT_ENV_VARS = (
     "SAYT_SOURCE_FILE",
@@ -42,20 +41,10 @@ def _clear_script_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def _load_script_module():
     """Load the SAYT build script directly from the repository scripts directory."""
-    script_path = (
-        Path(__file__).resolve().parents[1] / "scripts" / "build_sayt_artifacts.py"
+    return load_script_module(
+        script_name="build_sayt_artifacts.py",
+        module_name="build_sayt_artifacts_script",
     )
-    spec = importlib.util.spec_from_file_location(
-        "build_sayt_artifacts_script",
-        script_path,
-    )
-    if spec is None or spec.loader is None:
-        raise RuntimeError("Unable to load build_sayt_artifacts.py")
-
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
 
 
 @pytest.fixture(name="sayt_script")
@@ -74,7 +63,7 @@ def _set_script_argv(
     *args: str,
 ) -> None:
     """Set sys.argv to mimic invoking the SAYT build script from the shell."""
-    monkeypatch.setattr(sys, "argv", ["build_sayt_artifacts.py", *args])
+    set_script_argv(monkeypatch, "build_sayt_artifacts.py", *args)
 
 
 @pytest.mark.utils
@@ -85,9 +74,6 @@ def test_script_runs_main_when_executed_as_main_module(
     """Verify that the __main__ entrypoint delegates to main and exits cleanly."""
     builder_calls: list[dict[str, object]] = []
     build_calls: list[tuple[str, bool]] = []
-    script_path = (
-        Path(__file__).resolve().parents[1] / "scripts" / "build_sayt_artifacts.py"
-    )
 
     def fake_info(*_args, **_kwargs) -> None:
         """Ignore info logs during the test."""
@@ -125,10 +111,7 @@ def test_script_runs_main_when_executed_as_main_module(
         fake_get_logger,
     )
 
-    with pytest.raises(SystemExit) as exc_info:
-        runpy.run_path(str(script_path), run_name="__main__")
-
-    assert exc_info.value.code == 0
+    assert run_script_as_main("build_sayt_artifacts.py") == 0
     assert builder_calls == [
         {
             "file_path": "data/sayt.csv",
