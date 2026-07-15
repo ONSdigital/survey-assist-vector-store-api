@@ -11,15 +11,24 @@ clean: ## Clean the temporary files.
 	rm -rf .ruff_cache
 
 # Make does not like interpreting : in the target name, so we use a variable
-API_CMD=poetry run uvicorn survey_assist_vector_store_api.api.main:app --host 0.0.0.0 --port 8088 --reload
+VS_API_CMD=poetry run uvicorn survey_assist_vector_store_api.vector_search_api.main:app --host 0.0.0.0 --port 8088 --reload
+SAYT_API_CMD=poetry run uvicorn survey_assist_vector_store_api.sayt_api.main:app --host 0.0.0.0 --port 8089 --reload
 
 .PHONY: build-vector-store
 build-vector-store: ## Build the vector store
 	poetry run python scripts/build_vector_store_artifacts.py
 
+.PHONY: build-sayt-artifacts
+build-sayt-artifacts: ## Build SAYT artifacts
+	poetry run python scripts/build_sayt_artifacts.py
+
 .PHONY: run-vector-store
 run-vector-store: ## Run the vector store and API
-	$(API_CMD)
+	$(VS_API_CMD)
+
+.PHONY: run-sayt-api
+run-sayt-api: ## Run the SAYT API
+	$(SAYT_API_CMD)
 
 .PHONY: run-docs
 run-docs: ## Run the mkdocs

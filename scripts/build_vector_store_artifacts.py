@@ -5,7 +5,9 @@ import sys
 from survey_assist_embed_core import build_embedding_index
 from survey_assist_utils.logging import get_logger
 
-from survey_assist_vector_store_api.api.deps.settings import BuildVectorStoreSettings
+from survey_assist_vector_store_api.vector_search_api.deps.settings import (
+    BuildVectorStoreSettings,
+)
 
 logger = get_logger(__name__)
 
