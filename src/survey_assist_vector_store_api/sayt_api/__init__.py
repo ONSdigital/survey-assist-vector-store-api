@@ -1,0 +1,1 @@
+"""SAYT FastAPI service package."""
