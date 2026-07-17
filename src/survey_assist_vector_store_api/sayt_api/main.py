@@ -3,6 +3,9 @@
 from survey_assist_utils.logging import get_logger
 
 from survey_assist_vector_store_api.sayt_api.lifespan import sayt_lifespan
+from survey_assist_vector_store_api.sayt_api.routes.runtime_config import (
+    router as runtime_config_router,
+)
 from survey_assist_vector_store_api.sayt_api.routes.suggest import (
     router as suggest_router,
 )
@@ -30,6 +33,6 @@ app = create_app(
     metadata=DEFAULT_APP_METADATA,
     api_prefix=DEFAULT_API_PREFIX,
     lifespan=sayt_lifespan,
-    routers=(suggest_router,),
+    routers=(runtime_config_router, suggest_router),
     logger=logger,
 )

@@ -6,10 +6,11 @@ import runpy
 import sys
 from pathlib import Path
 from types import ModuleType
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 
 from survey_assist_vector_store_api.shared.fastapi_app import AppMetadata, create_app
 
@@ -29,8 +30,8 @@ def assert_registered_generic_error_handler(
 
     monkeypatch.setattr(logger, "error", fake_error)
 
-    response = asyncio.run(
-        app.exception_handlers[Exception](request, RuntimeError("boom"))
+    response: JSONResponse = asyncio.run(
+        cast(Any, app.exception_handlers[Exception])(request, RuntimeError("boom"))
     )
 
     assert len(logged_messages) == 1
@@ -50,6 +51,17 @@ def create_test_app(
     lifespan: Any | None = None,
 ) -> FastAPI:
     """Create a service app for tests with optional metadata or lifespan overrides."""
+    routers: tuple[Any, ...]
+    if hasattr(main_module, "search_index_router"):
+        routers = (main_module.runtime_config_router, main_module.search_index_router)
+    elif hasattr(main_module, "suggest_router") and hasattr(
+        main_module,
+        "runtime_config_router",
+    ):
+        routers = (main_module.runtime_config_router, main_module.suggest_router)
+    else:
+        routers = (main_module.suggest_router,)
+
     return create_app(
         metadata=metadata or main_module.DEFAULT_APP_METADATA,
         api_prefix=main_module.DEFAULT_API_PREFIX,
@@ -58,18 +70,14 @@ def create_test_app(
             if hasattr(main_module, "vector_store_lifespan")
             else lifespan or main_module.sayt_lifespan
         ),
-        routers=(
-            (main_module.runtime_config_router, main_module.search_index_router)
-            if hasattr(main_module, "runtime_config_router")
-            else (main_module.suggest_router,)
-        ),
+        routers=routers,
         logger=main_module.logger,
     )
 
 
 def load_script_module(*, script_name: str, module_name: str) -> ModuleType:
     """Load a script from the repository scripts directory as an importable module."""
-    script_path = Path(__file__).resolve().parents[2] / "scripts" / script_name
+    script_path = Path(__file__).resolve().parents[1] / "scripts" / script_name
     spec = importlib.util.spec_from_file_location(module_name, script_path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Unable to load {script_name}")
@@ -91,9 +99,9 @@ def set_script_argv(
 
 def run_script_as_main(script_name: str) -> int:
     """Execute a repository script as __main__ and return its exit code."""
-    script_path = Path(__file__).resolve().parents[2] / "scripts" / script_name
+    script_path = Path(__file__).resolve().parents[1] / "scripts" / script_name
 
     with pytest.raises(SystemExit) as exc_info:
         runpy.run_path(str(script_path), run_name="__main__")
 
-    return exc_info.value.code
+    return cast(int, exc_info.value.code)
