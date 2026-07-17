@@ -9,6 +9,7 @@ class BaseBuildSettings(BaseSettings):
     model_config = SettingsConfigDict(
         cli_parse_args=True,
         cli_kebab_case=True,
+        cli_implicit_flags="dual",
         extra="ignore",
         populate_by_name=True,
         env_file=".env",
