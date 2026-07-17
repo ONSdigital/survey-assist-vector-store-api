@@ -5,6 +5,10 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from survey_assist_embed_core.sayt import Suggestion
 
+from survey_assist_vector_store_api.sayt_api import lifespan as lifespan_module
+from survey_assist_vector_store_api.sayt_api import main as main_module
+from tests.helpers import create_test_app
+
 
 class FakeSuggester:  # pylint: disable=too-few-public-methods
     """Simple test double for the embed-core SAYT suggester."""
@@ -60,3 +64,35 @@ def test_suggest_route_accepts_null_query(
 
     assert response.status_code == status.HTTP_200_OK
     assert fake_suggester.calls == [(None, None)]
+
+
+@pytest.mark.api
+def test_create_app_loads_suggester_on_startup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify that the concrete app constructs the suggester during startup."""
+    fake_suggester = FakeSuggester()
+    settings_marker = object()
+    seen_settings: list[object] = []
+
+    def fake_get_settings() -> object:
+        return settings_marker
+
+    def fake_load_suggester(settings: object) -> FakeSuggester:
+        seen_settings.append(settings)
+        return fake_suggester
+
+    monkeypatch.setattr(lifespan_module, "get_settings", fake_get_settings)
+    monkeypatch.setattr(lifespan_module, "load_suggester", fake_load_suggester)
+
+    app = create_test_app(
+        main_module,
+        lifespan=main_module.sayt_lifespan,
+    )
+
+    with TestClient(app) as client:
+        response = client.post("/v1/suggest", json={"query": "soft"})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert seen_settings == [settings_marker]
+    assert fake_suggester.calls == [("soft", None)]
