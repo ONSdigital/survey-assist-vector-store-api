@@ -1,18 +1,9 @@
 """Tests for the SAYT suggest route."""
 
-from dataclasses import dataclass
-
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-
-
-@dataclass
-class FakeSuggestion:
-    """Simple scored suggestion returned by the fake suggester."""
-
-    display_text: str
-    score: float
+from survey_assist_embed_core.sayt import Suggestion
 
 
 class FakeSuggester:  # pylint: disable=too-few-public-methods
@@ -25,12 +16,12 @@ class FakeSuggester:  # pylint: disable=too-few-public-methods
         self,
         query: str | None,
         num_suggestions: int | None = None,
-    ) -> list[FakeSuggestion]:
+    ) -> list[Suggestion]:
         """Record inputs and return a deterministic set of suggestions."""
         self.calls.append((query, num_suggestions))
         return [
-            FakeSuggestion(display_text="Software developer", score=0.95),
-            FakeSuggestion(display_text="Software engineer", score=0.91),
+            Suggestion(display_text="Software developer", score=0.95),
+            Suggestion(display_text="Software engineer", score=0.91),
         ]
 
 
@@ -49,12 +40,10 @@ def test_suggest_route_uses_suggester_from_request_state(
         )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "suggestions": [
-            {"display_text": "Software developer", "score": 0.95},
-            {"display_text": "Software engineer", "score": 0.91},
-        ]
-    }
+    assert response.json() == [
+        {"display_text": "Software developer", "score": 0.95},
+        {"display_text": "Software engineer", "score": 0.91},
+    ]
     assert fake_suggester.calls == [("soft", 2)]
 
 
