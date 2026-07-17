@@ -71,7 +71,6 @@ def test_build_settings_accept_aliases_and_defaults(
             "--max",
             "7",
             "--replace",
-            "true",
         ],
     )
 

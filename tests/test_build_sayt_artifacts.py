@@ -165,7 +165,6 @@ def test_main_uses_cli_arguments(
         "--max-suggestions",
         "7",
         "--overwrite",
-        "true",
     )
 
     exit_code = sayt_script.main()

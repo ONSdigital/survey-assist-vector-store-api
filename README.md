@@ -113,6 +113,14 @@ Build the SAYT artifacts:
 make build-sayt
 ```
 
+You can also run the build scripts directly and inspect their supported CLI
+flags with `--help`:
+
+```shell
+poetry run python scripts/build_vector_store_artifacts.py --help
+poetry run python scripts/build_sayt_artifacts.py --help
+```
+
 ### Start Applications
 
 Run the vector-search API:
