@@ -145,8 +145,7 @@ Key runtime endpoints:
 ## Configuration
 
 Copy `.env.example` to `.env` and adjust values for your environment. The same
-`.env` file is used by the API runtime settings and the vector-store build
-script.
+`.env` file is used by both API runtimes and both local artifact-build scripts.
 
 | Variable               | Description                                                                    | Required            | Notes                                                                             |
 | ---------------------- | ------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------- |
@@ -160,6 +159,7 @@ script.
 | DISPLAY_TEXT_COL       | Optional CSV column used as SAYT display text                                  | No                  | Defaults to the search-text column when omitted                                   |
 | MIN_CHARS              | Minimum query length baked into built SAYT artifacts                           | No                  | Defaults to `4`                                                                   |
 | MAX_SUGGESTIONS        | Default suggestion count baked into built SAYT artifacts                       | No                  | Defaults to `10`                                                                  |
+| OVERWRITE              | Replace an existing SAYT artifact directory during local builds                | No                  | Defaults to `false`; used by `make build-sayt` only                               |
 
 ## Repository Structure
 
