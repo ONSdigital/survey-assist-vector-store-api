@@ -99,6 +99,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 ## Running Locally
 
+### Build Artifacts
+
+Build the vector-search artifacts:
+
+```shell
+make build-vector-store
+```
+
+Build the SAYT artifacts:
+
+```shell
+make build-sayt
+```
+
 ### Start Applications
 
 Run the vector-search API:
@@ -120,8 +134,13 @@ Vector-search docs: http://localhost:8088/docs
 SAYT docs: http://localhost:8089/docs
 
 The OpenAPI descriptions include the installed package versions for
-`survey-assist-vector-store-api` and `survey-assist-embed-core`. Vector-search
-runtime configuration is available from `GET /v1/runtime-config`.
+`survey-assist-vector-store-api` and `survey-assist-embed-core`.
+
+Key runtime endpoints:
+
+- Vector-search runtime configuration: `GET /v1/runtime-config`
+- SAYT runtime configuration: `GET /v1/runtime-config`
+- SAYT suggestions: `POST /v1/suggest`, returning a JSON array of scored suggestions
 
 ## Configuration
 
@@ -136,7 +155,7 @@ script.
 | INDEX_SOURCE_FILE      | Local path or GCS URI for the source data used to build vector-store artifacts | Only for build step | Required by `make build-vector-store` / `scripts/build_vector_store_artifacts.py` |
 | EMBEDDING_MODEL_NAME   | Embedding model override for vector-store artifact generation                  | No                  | Defaults to the embed-core model if omitted                                       |
 | SAYT_ARTIFACT_DIR      | Directory or GCS URI for persisted SAYT artifacts                              | No                  | Defaults to `sayt_artifact`; used by the SAYT API and build script                |
-| SAYT_SOURCE_FILE       | Local path or GCS URI for the source CSV used to build SAYT artifacts          | Only for build step | Required by `make build-sayt-artifacts` / `scripts/build_sayt_artifacts.py`       |
+| SAYT_SOURCE_FILE       | Local path or GCS URI for the source CSV used to build SAYT artifacts          | Only for build step | Required by `make build-sayt` / `scripts/build_sayt_artifacts.py`                 |
 | SEARCH_TEXT_COL        | CSV column used as SAYT search text                                            | No                  | Defaults to `title`                                                               |
 | DISPLAY_TEXT_COL       | Optional CSV column used as SAYT display text                                  | No                  | Defaults to the search-text column when omitted                                   |
 | MIN_CHARS              | Minimum query length baked into built SAYT artifacts                           | No                  | Defaults to `4`                                                                   |

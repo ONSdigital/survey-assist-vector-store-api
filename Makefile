@@ -22,12 +22,12 @@ build-vector-store: ## Build the vector store
 build-sayt: ## Build SAYT artifacts
 	poetry run python scripts/build_sayt_artifacts.py
 
-.PHONY: run-vector-store
-run-vector-store: ## Run the vector store and API
+.PHONY: run-vector-search-api
+run-vector-search-api: ## Run the vector-search API
 	$(VS_API_CMD)
 
-.PHONY: run-sayt
-run-sayt: ## Run the SAYT API
+.PHONY: run-sayt-api
+run-sayt-api: ## Run the SAYT API
 	$(SAYT_API_CMD)
 
 .PHONY: run-docs
