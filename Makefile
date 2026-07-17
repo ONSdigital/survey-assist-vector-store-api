@@ -18,16 +18,16 @@ SAYT_API_CMD=poetry run uvicorn survey_assist_vector_store_api.sayt_api.main:app
 build-vector-store: ## Build the vector store
 	poetry run python scripts/build_vector_store_artifacts.py
 
-.PHONY: build-sayt-artifacts
-build-sayt-artifacts: ## Build SAYT artifacts
+.PHONY: build-sayt
+build-sayt: ## Build SAYT artifacts
 	poetry run python scripts/build_sayt_artifacts.py
 
 .PHONY: run-vector-store
 run-vector-store: ## Run the vector store and API
 	$(VS_API_CMD)
 
-.PHONY: run-sayt-api
-run-sayt-api: ## Run the SAYT API
+.PHONY: run-sayt
+run-sayt: ## Run the SAYT API
 	$(SAYT_API_CMD)
 
 .PHONY: run-docs
