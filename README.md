@@ -38,6 +38,7 @@ This repository now hosts two related FastAPI services used by Survey Assist:
 - [Contributing](#contributing)
 - [License](#license)
 - [Maintainers](#maintainers)
+- [Additional Documentation](#additional-documentation)
 
 ## Features
 
@@ -113,6 +114,12 @@ Build the SAYT artifacts:
 make build-sayt
 ```
 
+Rebuild SAYT artifacts and replace an existing local artifact directory:
+
+```shell
+make rebuild-sayt
+```
+
 You can also run the build scripts directly and inspect their supported CLI
 flags with `--help`:
 
@@ -155,19 +162,19 @@ Key runtime endpoints:
 Copy `.env.example` to `.env` and adjust values for your environment. The same
 `.env` file is used by both API runtimes and both local artifact-build scripts.
 
-| Variable               | Description                                                                    | Required            | Notes                                                                             |
-| ---------------------- | ------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------- |
-| VECTOR_STORE_DIR       | Directory or GCS URI for persisted vector-store artifacts                      | No                  | Defaults to `vector_store`; shared by the API and build script                    |
-| VECTOR_STORE_K_MATCHES | Maximum number of ranked matches returned per search request                   | No                  | Defaults to `20`                                                                  |
-| INDEX_SOURCE_FILE      | Local path or GCS URI for the source data used to build vector-store artifacts | Only for build step | Required by `make build-vector-store` / `scripts/build_vector_store_artifacts.py` |
-| EMBEDDING_MODEL_NAME   | Embedding model override for vector-store artifact generation                  | No                  | Defaults to the embed-core model if omitted                                       |
-| SAYT_ARTIFACT_DIR      | Directory or GCS URI for persisted SAYT artifacts                              | No                  | Defaults to `sayt_artifact`; used by the SAYT API and build script                |
-| SAYT_SOURCE_FILE       | Local path or GCS URI for the source CSV used to build SAYT artifacts          | Only for build step | Required by `make build-sayt` / `scripts/build_sayt_artifacts.py`                 |
-| SEARCH_TEXT_COL        | CSV column used as SAYT search text                                            | No                  | Defaults to `title`                                                               |
-| DISPLAY_TEXT_COL       | Optional CSV column used as SAYT display text                                  | No                  | Defaults to the search-text column when omitted                                   |
-| MIN_CHARS              | Minimum query length baked into built SAYT artifacts                           | No                  | Defaults to `4`                                                                   |
-| MAX_SUGGESTIONS        | Default suggestion count baked into built SAYT artifacts                       | No                  | Defaults to `10`                                                                  |
-| OVERWRITE              | Replace an existing SAYT artifact directory during local builds                | No                  | Defaults to `false`; used by `make build-sayt` only                               |
+| Variable               | Description                                                                    | Required            | Notes                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------------------- |
+| VECTOR_STORE_DIR       | Directory or GCS URI for persisted vector-store artifacts                      | No                  | Defaults to `vector_store`; shared by the API and build script                                |
+| VECTOR_STORE_K_MATCHES | Maximum number of ranked matches returned per search request                   | No                  | Defaults to `20`                                                                              |
+| INDEX_SOURCE_FILE      | Local path or GCS URI for the source data used to build vector-store artifacts | Only for build step | Required by `make build-vector-store` / `scripts/build_vector_store_artifacts.py`             |
+| EMBEDDING_MODEL_NAME   | Embedding model override for vector-store artifact generation                  | No                  | Defaults to the embed-core model if omitted                                                   |
+| SAYT_ARTIFACT_DIR      | Directory or GCS URI for persisted SAYT artifacts                              | No                  | Defaults to `sayt_artifact`; used by the SAYT API and build script                            |
+| SAYT_SOURCE_FILE       | Local path or GCS URI for the source CSV used to build SAYT artifacts          | Only for build step | Required by `make build-sayt` / `scripts/build_sayt_artifacts.py`                             |
+| SEARCH_TEXT_COL        | CSV column used as SAYT search text                                            | No                  | Defaults to `title`                                                                           |
+| DISPLAY_TEXT_COL       | Optional CSV column used as SAYT display text                                  | No                  | Defaults to the search-text column when omitted                                               |
+| MIN_CHARS              | Minimum query length baked into built SAYT artifacts                           | No                  | Defaults to `4`                                                                               |
+| MAX_SUGGESTIONS        | Default suggestion count baked into built SAYT artifacts                       | No                  | Defaults to `10`                                                                              |
+| OVERWRITE              | Replace an existing SAYT artifact directory during local builds                | No                  | Defaults to `false`; can also be enabled explicitly with `make rebuild-sayt` or `--overwrite` |
 
 ## Repository Structure
 
@@ -224,15 +231,27 @@ Documentation is maintained using MkDocs.
 make run-docs
 ```
 
+## Release Process
+
+Release guidance is documented in [RELEASING.md](RELEASING.md).
+
 ## Contributing
 
 Please read [the contribution guidelines](CONTRIBUTING.md) before creating a pull request.
 
+## License
+
+This project is licensed under the terms in [LICENSE](LICENSE).
+
+## Maintainers
+
+Repository ownership and review responsibility are listed in [CODEOWNERS](CODEOWNERS).
+
 ## Additional Documentation
 
-[CONTRIBUTING.md](CONTRIBUTING.md)
-[RELEASING.md](RELEASING.md)
-[SECURITY.md](SECURITY.md)
-[CHANGELOG.md](CHANGELOG.md)
-[LICENSE.md](LICENSE.md)
-[CODEOWNERS.md](CODEOWNERS.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [RELEASING.md](RELEASING.md)
+- [SECURITY.md](SECURITY.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [LICENSE](LICENSE)
+- [CODEOWNERS](CODEOWNERS)
