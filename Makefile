@@ -28,7 +28,7 @@ build-sayt: ## Build SAYT artifacts
 
 .PHONY: rebuild-sayt
 rebuild-sayt: ## Rebuild SAYT artifacts
-    poetry run python scripts/build_sayt_artifacts.py --overwrite
+	poetry run python scripts/build_sayt_artifacts.py --overwrite
 
 .PHONY: run-vector-search-api
 run-vector-search-api: ## Run the vector-search API
