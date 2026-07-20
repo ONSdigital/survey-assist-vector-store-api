@@ -18,9 +18,17 @@ SAYT_API_CMD=poetry run uvicorn survey_assist_vector_store_api.sayt_api.main:app
 build-vector-store: ## Build the vector store
 	poetry run python scripts/build_vector_store_artifacts.py
 
+.PHONY: rebuild-vector-store
+rebuild-vector-store: ## Rebuild the vector store - added for symmetry with rebuild-sayt and if overwrite protection is added to embed-core in the future
+	poetry run python scripts/build_vector_store_artifacts.py
+
 .PHONY: build-sayt
 build-sayt: ## Build SAYT artifacts
 	poetry run python scripts/build_sayt_artifacts.py
+
+.PHONY: rebuild-sayt
+rebuild-sayt: ## Rebuild SAYT artifacts
+    poetry run python scripts/build_sayt_artifacts.py --overwrite
 
 .PHONY: run-vector-search-api
 run-vector-search-api: ## Run the vector-search API
