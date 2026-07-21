@@ -115,7 +115,7 @@ def test_script_runs_main_when_executed_as_main_module(
     assert builder_calls == [
         {
             "file_path": "data/sayt.csv",
-            "search_text_col": "title",
+            "search_text_col": "search_text",
             "display_text_col": None,
             "min_chars": 4,
             "max_suggestions": 10,
