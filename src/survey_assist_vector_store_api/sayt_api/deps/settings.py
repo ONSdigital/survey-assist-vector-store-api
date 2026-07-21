@@ -30,7 +30,7 @@ class BuildSaytArtifactsSettings(BaseBuildSettings):
         validation_alias=AliasChoices("artifact", "artifact_dir"),
     )
     search_text_col: str = Field(
-        default="title",
+        default="search_text",
         description="CSV column used as the SAYT search text.",
         validation_alias=AliasChoices("search-col"),
     )
