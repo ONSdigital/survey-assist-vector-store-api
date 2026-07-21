@@ -78,13 +78,17 @@ colima-start: ## Start Colima
 colima-stop: ## Stop Colima
 	colima stop
 
-.PHONY: docker-image
-docker-image: ## Build the Docker image
-	docker build -t vector-store -f DOCKERFILE .
+.PHONY: docker-build
+docker-build: ## Build container images; optionally set service=vector-search-api or service=sayt-api
+	docker compose build $(service)
 
-.PHONY: run-docker-image
-run-docker-image: ## Run the Docker image
-	docker run -p 8088:8088 vector-store
+.PHONY: docker-up
+docker-up: ## Run API containers; optionally set service=vector-search-api or service=sayt-api
+	docker compose up --build $(service)
+
+.PHONY: docker-down
+docker-down: ## Stop the running API containers
+	docker compose down
 
 .PHONY: docker-clean
 docker-clean: ## Clean Docker resources
