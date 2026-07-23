@@ -11,7 +11,7 @@ Both services are intended to be deployed as private backend services behind the
 
 - **Vector-store Retrieval**: Similarity-based SIC and SOC retrieval from built embedding artifacts
 - **SAYT Suggestions**: Low-latency search-as-you-type suggestions from built SAYT artifacts
-- **Runtime Configuration Endpoints**: Service-level config visibility for local debugging and operations
+- **Configuration Endpoints**: Service-level config visibility for local debugging and operations
 - **Artifact Build Scripts**: Local commands for creating vector-store and SAYT artifacts
 - **Interactive Documentation**: Built-in Swagger UI and ReDoc for each service
 

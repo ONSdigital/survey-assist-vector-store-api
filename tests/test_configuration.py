@@ -1,4 +1,4 @@
-"""Tests for the runtime-config route."""
+"""Tests for the configuration route."""
 
 import pytest
 from fastapi import status
@@ -7,7 +7,7 @@ from survey_assist_embed_core.models import EmbeddingStatus, VectorBackendConfig
 
 
 class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
-    """Simple test double exposing a fixed runtime configuration."""
+    """Simple test double exposing a fixed configuration."""
 
     def __init__(self):
         """Initialise the fake handler with deterministic configuration."""
@@ -27,21 +27,21 @@ class FakeEmbeddingHandler:  # pylint: disable=too-few-public-methods
         )
 
     def get_embed_config(self) -> EmbeddingStatus:
-        """Record access and return the configured runtime metadata."""
+        """Record access and return the configured metadata."""
         self.calls += 1
         return self._config
 
 
 @pytest.mark.api
-def test_runtime_config_route_returns_handler_configuration(
+def test_configuration_route_returns_handler_configuration(
     create_app_with_handler,
 ) -> None:
-    """Verify that the route returns the loaded handler runtime config."""
+    """Verify that the route returns the loaded handler configuration."""
     fake_handler = FakeEmbeddingHandler()
     app = create_app_with_handler(fake_handler)
 
     with TestClient(app) as client:
-        response = client.get("/v1/runtime-config")
+        response = client.get("/v1/configuration")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {

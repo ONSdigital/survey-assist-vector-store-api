@@ -53,12 +53,12 @@ def create_test_app(
     """Create a service app for tests with optional metadata or lifespan overrides."""
     routers: tuple[Any, ...]
     if hasattr(main_module, "search_index_router"):
-        routers = (main_module.runtime_config_router, main_module.search_index_router)
+        routers = (main_module.configuration_router, main_module.search_index_router)
     elif hasattr(main_module, "suggest_router") and hasattr(
         main_module,
-        "runtime_config_router",
+        "configuration_router",
     ):
-        routers = (main_module.runtime_config_router, main_module.suggest_router)
+        routers = (main_module.configuration_router, main_module.suggest_router)
     else:
         routers = (main_module.suggest_router,)
 

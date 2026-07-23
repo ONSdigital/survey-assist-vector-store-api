@@ -145,12 +145,12 @@ SAYT docs: http://localhost:8089/docs
 The OpenAPI descriptions include the installed package versions for
 `survey-assist-vector-store-api` and `survey-assist-embed-core`.
 
-Key runtime endpoints:
+Key endpoints:
 
 - Vector-store search: `POST /v1/search-index`, accepting cumulative query fragments in `query`
-- Vector-store runtime configuration: `GET /v1/runtime-config`, returning the loaded embedding configuration
+- Vector-store configuration: `GET /v1/configuration`, returning the loaded embedding configuration
 - SAYT suggestions: `POST /v1/suggest`, accepting `query` and optional `num_suggestions`
-- SAYT runtime configuration: `GET /v1/runtime-config`, returning the loaded SAYT configuration
+- SAYT configuration: `GET /v1/configuration`, returning the loaded SAYT configuration
 
 ## Configuration
 

@@ -1,4 +1,4 @@
-"""Routes for runtime embedding configuration."""
+"""Routes for vector-store configuration."""
 
 from typing import Annotated
 
@@ -10,11 +10,11 @@ from survey_assist_vector_store_api.vector_store_api.deps.vector_store import (
     get_embedding_handler,
 )
 
-router = APIRouter(tags=["runtime"])
+router = APIRouter(tags=["configuration"])
 
 
-@router.get("/runtime-config", response_model=EmbeddingStatus)
-def runtime_config(
+@router.get("/configuration", response_model=EmbeddingStatus)
+def configuration(
     handler: Annotated[EmbeddingHandler, Depends(get_embedding_handler)],
 ) -> EmbeddingStatus:
     """Return the effective configuration of the loaded embedding handler."""

@@ -27,9 +27,9 @@ The main local endpoints are:
 - Vector-store docs: `http://localhost:8088/docs`
 - SAYT docs: `http://localhost:8089/docs`
 - Vector-store search: `POST /v1/search-index`
-- Vector-store runtime config: `GET /v1/runtime-config`
+- Vector-store configuration: `GET /v1/configuration`
 - SAYT suggestions: `POST /v1/suggest`
-- SAYT runtime config: `GET /v1/runtime-config`
+- SAYT configuration: `GET /v1/configuration`
 
 The vector-store search endpoint accepts a `query` list of cumulative fragments.
 The SAYT suggestions endpoint accepts `query` plus optional `num_suggestions` and returns a JSON array of scored suggestions.
@@ -41,7 +41,7 @@ These services integrate with the Survey Assist API to provide:
 - Embedding-based similarity search for SIC code classification
 - Embedding-based similarity search for SOC code classification
 - Search-as-you-type suggestions for supported classification flows
-- Runtime configuration inspection for both services
+- Configuration inspection for both services
 - Efficient artifact-backed retrieval
 
 ## Documentation

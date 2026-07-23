@@ -1,4 +1,4 @@
-"""Tests for the SAYT runtime-config route."""
+"""Tests for the SAYT configuration route."""
 
 import pytest
 from fastapi import status
@@ -14,7 +14,7 @@ from survey_assist_embed_core.sayt.core import (
 
 
 class FakeSuggester:  # pylint: disable=too-few-public-methods
-    """Simple test double exposing a fixed runtime configuration."""
+    """Simple test double exposing a fixed configuration."""
 
     def __init__(self) -> None:
         """Initialise the fake suggester with deterministic configuration."""
@@ -51,21 +51,21 @@ class FakeSuggester:  # pylint: disable=too-few-public-methods
         )
 
     def get_config(self) -> SaytConfiguration:
-        """Record access and return the configured runtime metadata."""
+        """Record access and return the configured metadata."""
         self.calls += 1
         return self._config
 
 
 @pytest.mark.api
-def test_runtime_config_route_returns_suggester_configuration(
+def test_configuration_route_returns_suggester_configuration(
     create_sayt_app_with_suggester,
 ) -> None:
-    """Verify that the route returns the loaded suggester runtime config."""
+    """Verify that the route returns the loaded suggester configuration."""
     fake_suggester = FakeSuggester()
     app = create_sayt_app_with_suggester(fake_suggester)
 
     with TestClient(app) as client:
-        response = client.get("/v1/runtime-config")
+        response = client.get("/v1/configuration")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {

@@ -10,8 +10,8 @@ from survey_assist_vector_store_api.shared.fastapi_app import AppMetadata, creat
 from survey_assist_vector_store_api.vector_store_api.lifespan import (
     vector_store_lifespan,
 )
-from survey_assist_vector_store_api.vector_store_api.routes.runtime_config import (
-    router as runtime_config_router,
+from survey_assist_vector_store_api.vector_store_api.routes.configuration import (
+    router as configuration_router,
 )
 from survey_assist_vector_store_api.vector_store_api.routes.search_index import (
     router as search_index_router,
@@ -35,6 +35,6 @@ app = create_app(
     metadata=DEFAULT_APP_METADATA,
     api_prefix=DEFAULT_API_PREFIX,
     lifespan=vector_store_lifespan,
-    routers=(runtime_config_router, search_index_router),
+    routers=(configuration_router, search_index_router),
     logger=logger,
 )
