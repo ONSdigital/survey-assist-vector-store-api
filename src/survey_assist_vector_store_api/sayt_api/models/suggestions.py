@@ -13,10 +13,11 @@ class SuggestionsRequest(BaseModel):
     )
     num_suggestions: int | None = Field(
         default=None,
+        gt=0,
         description=(
-            "Optional per-request suggestion limit. When omitted, the loaded "
-            "SAYT artifact's built-in default is used, which comes from "
-            "MAX_SUGGESTIONS at artifact build time."
+            "Optional positive per-request suggestion limit. When omitted, "
+            "the loaded SAYT artifact's built-in default is used, which is "
+            "configured at artifact build time."
         ),
     )
 

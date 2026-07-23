@@ -40,14 +40,23 @@ class BuildSaytArtifactsSettings(BaseBuildSettings):
         validation_alias=AliasChoices("display-col"),
     )
     min_chars: int = Field(
-        default=4,
+        default=3,
+        ge=3,
         description="Minimum query length baked into the built SAYT artifact.",
         validation_alias=AliasChoices("min"),
     )
-    max_suggestions: int = Field(
+    default_num_suggestions: int = Field(
         default=10,
-        description=("Default suggestion count baked into the built SAYT artifact."),
-        validation_alias=AliasChoices("limit", "max"),
+        gt=0,
+        le=100,
+        description=(
+            "Default suggestion count baked into the built SAYT artifact and "
+            "used when requests omit num_suggestions."
+        ),
+        validation_alias=AliasChoices(
+            "default_suggestions",
+            "max_suggestions",
+        ),
     )
 
 

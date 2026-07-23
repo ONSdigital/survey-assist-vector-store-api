@@ -26,6 +26,10 @@ SCRIPT_ENV_VARS = (
     "display_text_col",
     "MIN_CHARS",
     "min_chars",
+    "DEFAULT_SUGGESTIONS",
+    "default_suggestions",
+    "DEFAULT_NUM_SUGGESTIONS",
+    "default_num_suggestions",
     "MAX_SUGGESTIONS",
     "max_suggestions",
 )
@@ -115,7 +119,7 @@ def test_script_runs_main_when_executed_as_main_module(
             "file_path": "data/sayt.csv",
             "search_text_col": "search_text",
             "display_text_col": "display_text",
-            "min_chars": 4,
+            "min_chars": 3,
             "max_suggestions": 10,
         }
     ]
@@ -159,8 +163,8 @@ def test_main_uses_cli_arguments(
         "--display-text-col",
         "display_title",
         "--min-chars",
-        "2",
-        "--max-suggestions",
+        "3",
+        "--default-num-suggestions",
         "7",
     )
 
@@ -172,7 +176,7 @@ def test_main_uses_cli_arguments(
             "file_path": "gs://bucket/sayt.csv",
             "search_text_col": "search_title",
             "display_text_col": "display_title",
-            "min_chars": 2,
+            "min_chars": 3,
             "max_suggestions": 7,
         }
     ]
@@ -210,7 +214,7 @@ def test_main_uses_environment_defaults(
     monkeypatch.setenv("SEARCH_TEXT_COL", "search_text")
     monkeypatch.setenv("DISPLAY_TEXT_COL", "display_text")
     monkeypatch.setenv("MIN_CHARS", "3")
-    monkeypatch.setenv("MAX_SUGGESTIONS", "8")
+    monkeypatch.setenv("DEFAULT_NUM_SUGGESTIONS", "8")
     _set_script_argv(monkeypatch)
 
     exit_code = sayt_script.main()

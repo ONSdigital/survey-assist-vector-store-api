@@ -149,13 +149,14 @@ Key endpoints:
 
 - Vector-store search: `POST /v1/search-index`, accepting cumulative query fragments in `query`
 - Vector-store configuration: `GET /v1/configuration`, returning the loaded embedding configuration
-- SAYT suggestions: `POST /v1/suggestions`, accepting `query` and optional `num_suggestions`, and returning plain display text under `suggestions`
+- SAYT suggestions: `POST /v1/suggestions`, accepting `query` and optional positive `num_suggestions`, and returning plain display text under `suggestions`
 - SAYT scored suggestions: `POST /v1/scored-suggestions`, accepting the same request body and returning scored suggestions under `suggestions`
 - SAYT configuration: `GET /v1/configuration`, returning the loaded SAYT configuration
 
-For both SAYT endpoints, `num_suggestions` is a per-request override. If it is
-omitted, the API falls back to the default baked into the loaded SAYT artifact,
-which is set by `MAX_SUGGESTIONS` when the artifact is built.
+For both SAYT endpoints, `num_suggestions` is an optional positive per-request
+override. If it is omitted, the API falls back to the default baked into the
+loaded SAYT artifact, which is set by `DEFAULT_NUM_SUGGESTIONS` when the
+artifact is built.
 
 ## Configuration
 
@@ -166,10 +167,10 @@ The highest-signal variables are:
 
 - `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` for the runtime artifact locations
 - `INDEX_SOURCE_FILE` for vector-store builds
-- `SAYT_SOURCE_FILE`, `SEARCH_TEXT_COL`, `DISPLAY_TEXT_COL`, `MIN_CHARS`, and `MAX_SUGGESTIONS` for SAYT builds
+- `SAYT_SOURCE_FILE`, `SEARCH_TEXT_COL`, `DISPLAY_TEXT_COL`, `MIN_CHARS`, and `DEFAULT_NUM_SUGGESTIONS` for SAYT builds
 
 For the full runtime/build variable matrix, defaults, and notes about how
-`num_suggestions` interacts with `MAX_SUGGESTIONS`, see
+`num_suggestions` interacts with `DEFAULT_NUM_SUGGESTIONS`, see
 [the guide configuration section](docs/guide.md#configuration).
 
 ## Repository Structure

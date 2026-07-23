@@ -33,7 +33,7 @@ def main() -> int:
         search_text_col=config.search_text_col,
         display_text_col=config.display_text_col,
         min_chars=config.min_chars,
-        max_suggestions=config.max_suggestions,
+        max_suggestions=config.default_num_suggestions,
     )
     builder.build_artifact(
         config.sayt_artifact_dir,

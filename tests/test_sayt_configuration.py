@@ -20,7 +20,7 @@ class FakeSuggester:  # pylint: disable=too-few-public-methods
         """Initialise the fake suggester with deterministic configuration."""
         self.calls = 0
         self._config = SaytConfiguration(
-            settings=SaytGlobalSettings(min_chars=2, max_suggestions=10),
+            settings=SaytGlobalSettings(min_chars=3, max_suggestions=10),
             corpus=SaytCorpusSummary(
                 size=120,
                 unique_display_texts=100,
@@ -69,7 +69,7 @@ def test_configuration_route_returns_suggester_configuration(
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
-        "settings": {"min_chars": 2, "max_suggestions": 10},
+        "settings": {"min_chars": 3, "max_suggestions": 10},
         "corpus": {
             "size": 120,
             "unique_display_texts": 100,

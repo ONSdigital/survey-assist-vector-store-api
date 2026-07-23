@@ -115,6 +115,29 @@ def test_suggestions_route_accepts_null_query(
 
 
 @pytest.mark.api
+@pytest.mark.parametrize("endpoint", ["/v1/suggestions", "/v1/scored-suggestions"])
+@pytest.mark.parametrize("num_suggestions", [0, -1])
+def test_suggestions_routes_require_positive_num_suggestions(
+    create_sayt_app_with_suggester,
+    endpoint: str,
+    num_suggestions: int,
+) -> None:
+    """Verify that num_suggestions must be a positive integer when provided."""
+    fake_suggester = FakeSuggester()
+    app = create_sayt_app_with_suggester(fake_suggester)
+
+    with TestClient(app) as client:
+        response = client.post(
+            endpoint,
+            json={"query": "soft", "num_suggestions": num_suggestions},
+        )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert not fake_suggester.suggest_calls
+    assert not fake_suggester.suggest_with_scores_calls
+
+
+@pytest.mark.api
 def test_create_app_loads_suggester_on_startup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
