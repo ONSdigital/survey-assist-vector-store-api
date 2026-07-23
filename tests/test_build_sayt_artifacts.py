@@ -28,8 +28,6 @@ SCRIPT_ENV_VARS = (
     "min_chars",
     "MAX_SUGGESTIONS",
     "max_suggestions",
-    "OVERWRITE",
-    "overwrite",
 )
 
 
@@ -121,7 +119,7 @@ def test_script_runs_main_when_executed_as_main_module(
             "max_suggestions": 10,
         }
     ]
-    assert build_calls == [("sayt_artifact", False)]
+    assert build_calls == [("sayt_artifact", True)]
 
 
 @pytest.mark.utils
@@ -164,7 +162,6 @@ def test_main_uses_cli_arguments(
         "2",
         "--max-suggestions",
         "7",
-        "--overwrite",
     )
 
     exit_code = sayt_script.main()
@@ -214,7 +211,6 @@ def test_main_uses_environment_defaults(
     monkeypatch.setenv("DISPLAY_TEXT_COL", "display_text")
     monkeypatch.setenv("MIN_CHARS", "3")
     monkeypatch.setenv("MAX_SUGGESTIONS", "8")
-    monkeypatch.setenv("OVERWRITE", "true")
     _set_script_argv(monkeypatch)
 
     exit_code = sayt_script.main()
@@ -241,37 +237,4 @@ def test_main_requires_sayt_source_file(
     _set_script_argv(monkeypatch)
 
     with pytest.raises(SystemExit):
-        sayt_script.main()
-
-
-@pytest.mark.utils
-def test_main_wraps_existing_artifact_dir_error_with_overwrite_hint(
-    sayt_script,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Explain how to replace an existing SAYT artifact directory."""
-
-    class FakeBuilder:  # pylint: disable=too-few-public-methods
-        """Minimal fake builder for the script under test."""
-
-        def build_artifact(self, output_dir: str, *, overwrite: bool = False) -> None:
-            """Simulate an existing artifact directory failure."""
-            raise FileExistsError(output_dir)
-
-    class FakeBuilderFactory:  # pylint: disable=too-few-public-methods
-        """Class double providing the from_csv entrypoint."""
-
-        @classmethod
-        def from_csv(cls, _file_path: str, **_kwargs: object) -> FakeBuilder:
-            """Return a fake builder that raises on build."""
-            return FakeBuilder()
-
-    monkeypatch.setattr(sayt_script, "SAYTBuilder", FakeBuilderFactory)
-    monkeypatch.setenv("SAYT_SOURCE_FILE", "data/sayt.csv")
-    _set_script_argv(monkeypatch)
-
-    with pytest.raises(
-        SystemExit,
-        match=r"Rerun with --overwrite or set OVERWRITE=true to replace it.",
-    ):
         sayt_script.main()

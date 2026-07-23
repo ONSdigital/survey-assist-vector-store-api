@@ -35,16 +35,10 @@ def main() -> int:
         min_chars=config.min_chars,
         max_suggestions=config.max_suggestions,
     )
-    try:
-        builder.build_artifact(
-            config.sayt_artifact_dir,
-            overwrite=config.overwrite,
-        )
-    except FileExistsError as exc:
-        raise SystemExit(
-            "SAYT artifact directory already exists. Rerun with --overwrite "
-            "or set OVERWRITE=true to replace it."
-        ) from exc
+    builder.build_artifact(
+        config.sayt_artifact_dir,
+        overwrite=True,
+    )
 
     logger.info(
         "SAYT artifacts built successfully",

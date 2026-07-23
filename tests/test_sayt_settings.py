@@ -70,7 +70,6 @@ def test_build_settings_accept_aliases_and_defaults(
             "2",
             "--max",
             "7",
-            "--replace",
         ],
     )
 
@@ -82,4 +81,3 @@ def test_build_settings_accept_aliases_and_defaults(
     assert settings.display_text_col == "display_title"
     assert settings.min_chars == expected_min_chars
     assert settings.max_suggestions == expected_max_suggestions
-    assert settings.overwrite is True

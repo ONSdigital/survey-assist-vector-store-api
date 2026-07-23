@@ -52,11 +52,6 @@ class BuildSaytArtifactsSettings(BaseBuildSettings):
         description=("Default suggestion count baked into the built SAYT artifact."),
         validation_alias=AliasChoices("limit", "max"),
     )
-    overwrite: bool = Field(
-        default=False,
-        description="Replace an existing SAYT artifact directory when true.",
-        validation_alias=AliasChoices("replace"),
-    )
 
 
 class RuntimeSaytSettings(BaseSettings):
