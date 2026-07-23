@@ -166,7 +166,7 @@ Copy `.env.example` to `.env` and adjust values for your environment. The same
 | SAYT_ARTIFACT_DIR      | Directory or GCS URI for persisted SAYT artifacts                              | No                  | Defaults to `sayt_artifact`; used by the SAYT API and build script                |
 | SAYT_SOURCE_FILE       | Local path or GCS URI for the source CSV used to build SAYT artifacts          | Only for build step | Required by `make build-sayt` / `scripts/build_sayt_artifacts.py`                 |
 | SEARCH_TEXT_COL        | CSV column used as SAYT search text                                            | No                  | Defaults to `search_text`                                                         |
-| DISPLAY_TEXT_COL       | Optional CSV column used as SAYT display text                                  | No                  | Defaults to the search-text column when omitted                                   |
+| DISPLAY_TEXT_COL       | CSV column used as SAYT display text                                           | No                  | Defaults to `display_text`                                                        |
 | MIN_CHARS              | Minimum query length baked into built SAYT artifacts                           | No                  | Defaults to `4`                                                                   |
 | MAX_SUGGESTIONS        | Default suggestion count baked into built SAYT artifacts                       | No                  | Defaults to `10`                                                                  |
 

@@ -81,3 +81,24 @@ def test_build_settings_accept_aliases_and_defaults(
     assert settings.display_text_col == "display_title"
     assert settings.min_chars == expected_min_chars
     assert settings.max_suggestions == expected_max_suggestions
+
+
+@pytest.mark.utils
+def test_build_settings_default_display_text_column(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    """Verify the SAYT build settings default the display-text column."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "build_sayt_artifacts.py",
+            "--src",
+            "gs://bucket/sayt.csv",
+        ],
+    )
+
+    settings = BuildSaytArtifactsSettings()
+
+    assert settings.display_text_col == "display_text"

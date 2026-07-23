@@ -34,12 +34,9 @@ class BuildSaytArtifactsSettings(BaseBuildSettings):
         description="CSV column used as the SAYT search text.",
         validation_alias=AliasChoices("search-col"),
     )
-    display_text_col: str | None = Field(
-        default=None,
-        description=(
-            "Optional CSV column used as the SAYT display text. When omitted, "
-            "the search-text column is reused."
-        ),
+    display_text_col: str = Field(
+        default="display_text",
+        description="CSV column used as the SAYT display text.",
         validation_alias=AliasChoices("display-col"),
     )
     min_chars: int = Field(
