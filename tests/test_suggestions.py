@@ -1,4 +1,4 @@
-"""Tests for the SAYT suggest route."""
+"""Tests for the SAYT suggestions route."""
 
 import pytest
 from fastapi import status
@@ -30,7 +30,7 @@ class FakeSuggester:  # pylint: disable=too-few-public-methods
 
 
 @pytest.mark.api
-def test_suggest_route_uses_suggester_from_request_state(
+def test_suggestions_route_uses_suggester_from_request_state(
     create_sayt_app_with_suggester,
 ) -> None:
     """Verify that the route reads the startup-loaded suggester from request state."""
@@ -39,20 +39,22 @@ def test_suggest_route_uses_suggester_from_request_state(
 
     with TestClient(app) as client:
         response = client.post(
-            "/v1/suggest",
+            "/v1/suggestions",
             json={"query": "soft", "num_suggestions": 2},
         )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [
-        {"display_text": "Software developer", "score": 0.95},
-        {"display_text": "Software engineer", "score": 0.91},
-    ]
+    assert response.json() == {
+        "suggestions": [
+            {"display_text": "Software developer", "score": 0.95},
+            {"display_text": "Software engineer", "score": 0.91},
+        ]
+    }
     assert fake_suggester.calls == [("soft", 2)]
 
 
 @pytest.mark.api
-def test_suggest_route_accepts_null_query(
+def test_suggestions_route_accepts_null_query(
     create_sayt_app_with_suggester,
 ) -> None:
     """Verify that the route passes null queries through to the suggester."""
@@ -60,9 +62,15 @@ def test_suggest_route_accepts_null_query(
     app = create_sayt_app_with_suggester(fake_suggester)
 
     with TestClient(app) as client:
-        response = client.post("/v1/suggest", json={"query": None})
+        response = client.post("/v1/suggestions", json={"query": None})
 
     assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "suggestions": [
+            {"display_text": "Software developer", "score": 0.95},
+            {"display_text": "Software engineer", "score": 0.91},
+        ]
+    }
     assert fake_suggester.calls == [(None, None)]
 
 
@@ -91,7 +99,7 @@ def test_create_app_loads_suggester_on_startup(
     )
 
     with TestClient(app) as client:
-        response = client.post("/v1/suggest", json={"query": "soft"})
+        response = client.post("/v1/suggestions", json={"query": "soft"})
 
     assert response.status_code == status.HTTP_200_OK
     assert seen_settings == [settings_marker]

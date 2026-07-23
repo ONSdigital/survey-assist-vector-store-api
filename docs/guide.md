@@ -28,11 +28,11 @@ The main local endpoints are:
 - SAYT docs: `http://localhost:8089/docs`
 - Vector-store search: `POST /v1/search-index`
 - Vector-store configuration: `GET /v1/configuration`
-- SAYT suggestions: `POST /v1/suggest`
+- SAYT suggestions: `POST /v1/suggestions`
 - SAYT configuration: `GET /v1/configuration`
 
 The vector-store search endpoint accepts a `query` list of cumulative fragments.
-The SAYT suggestions endpoint accepts `query` plus optional `num_suggestions` and returns a JSON array of scored suggestions.
+The SAYT suggestions endpoint accepts `query` plus optional `num_suggestions` and returns a JSON object whose `suggestions` field contains scored suggestions.
 
 ## Integration with Survey Assist API
 

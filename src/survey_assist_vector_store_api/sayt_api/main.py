@@ -6,8 +6,8 @@ from survey_assist_vector_store_api.sayt_api.lifespan import sayt_lifespan
 from survey_assist_vector_store_api.sayt_api.routes.configuration import (
     router as configuration_router,
 )
-from survey_assist_vector_store_api.sayt_api.routes.suggest import (
-    router as suggest_router,
+from survey_assist_vector_store_api.sayt_api.routes.suggestions import (
+    router as suggestions_router,
 )
 from survey_assist_vector_store_api.shared.app_metadata import (
     API_PACKAGE_VERSION,
@@ -33,6 +33,6 @@ app = create_app(
     metadata=DEFAULT_APP_METADATA,
     api_prefix=DEFAULT_API_PREFIX,
     lifespan=sayt_lifespan,
-    routers=(configuration_router, suggest_router),
+    routers=(configuration_router, suggestions_router),
     logger=logger,
 )

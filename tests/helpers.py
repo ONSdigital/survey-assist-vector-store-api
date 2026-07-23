@@ -54,13 +54,13 @@ def create_test_app(
     routers: tuple[Any, ...]
     if hasattr(main_module, "search_index_router"):
         routers = (main_module.configuration_router, main_module.search_index_router)
-    elif hasattr(main_module, "suggest_router") and hasattr(
+    elif hasattr(main_module, "suggestions_router") and hasattr(
         main_module,
         "configuration_router",
     ):
-        routers = (main_module.configuration_router, main_module.suggest_router)
+        routers = (main_module.configuration_router, main_module.suggestions_router)
     else:
-        routers = (main_module.suggest_router,)
+        routers = (main_module.suggestions_router,)
 
     return create_app(
         metadata=metadata or main_module.DEFAULT_APP_METADATA,
