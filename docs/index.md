@@ -13,6 +13,7 @@ Both services are intended to be deployed as private backend services behind the
 - **SAYT Suggestions**: Low-latency search-as-you-type suggestions from built SAYT artifacts
 - **Configuration Endpoints**: Service-level config visibility for local debugging and operations
 - **Artifact Build Scripts**: Local commands for creating vector-store and SAYT artifacts
+- **Containerised Local Runs**: Shared Docker and Compose setup for running one or both APIs with local artifact mounts
 - **Interactive Documentation**: Built-in Swagger UI and ReDoc for each service
 
 ## API Documentation
@@ -26,7 +27,8 @@ When running locally, each service exposes its own interactive documentation:
 
 ## Getting Started
 
-For setup, configuration, and local development commands, see the [Guide](guide.md).
+For setup, configuration, Docker Compose usage, and local development commands,
+see the [Guide](guide.md).
 
 ## Development
 

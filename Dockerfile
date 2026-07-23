@@ -24,7 +24,7 @@ FROM deps AS vector-search
 
 EXPOSE 8088
 
-CMD ["poetry", "run", "uvicorn", "survey_assist_vector_store_api.vector_search_api.main:app", "--host", "0.0.0.0", "--port", "8088"]
+CMD ["poetry", "run", "uvicorn", "survey_assist_vector_store_api.vector_store_api.main:app", "--host", "0.0.0.0", "--port", "8088"]
 
 FROM deps AS sayt
 

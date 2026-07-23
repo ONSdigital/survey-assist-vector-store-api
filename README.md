@@ -139,13 +139,15 @@ make run-sayt-api
 ### Run Containerised Services
 
 The repository also includes a root `compose.yaml` and a root multi-stage
-`Dockerfile` that builds separate vector-search and SAYT runtime images from
+`Dockerfile` that builds separate vector-store and SAYT runtime images from
 the same dependency base.
 
 Before using Docker Compose, build the artifacts you want the services to load
 and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those local
 directories. For example, if you want to switch from SIC to SOC locally, update
 the directory variables in `.env` to the SOC artifact directories.
+
+The exact Compose service names are `vector-search-api` and `sayt-api`.
 
 Build the images:
 
@@ -181,8 +183,8 @@ make docker-down
 
 By default, Docker Compose publishes:
 
-- vector-search on `http://localhost:8088`
-- SAYT on `http://localhost:8089`
+- vector-store API on `http://localhost:8088`
+- SAYT API on `http://localhost:8089`
 
 You can override those ports with `VECTOR_SEARCH_PORT` and `SAYT_PORT` in
 `.env`.

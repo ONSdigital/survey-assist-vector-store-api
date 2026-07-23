@@ -104,6 +104,35 @@ make run-vector-store-api
 make run-sayt-api
 ```
 
+Run the services with Docker Compose:
+
+```bash
+make docker-build
+make docker-up
+```
+
+You can also target a single Compose service:
+
+```bash
+make docker-build service=vector-search-api
+make docker-build service=sayt-api
+make docker-up service=vector-search-api
+make docker-up service=sayt-api
+```
+
+Before using Docker Compose, build the artifacts you want the containers to
+load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those
+local directories. The exact Compose service names are `vector-search-api` and
+`sayt-api`, while the exposed APIs remain the vector-store API on port `8088`
+and the SAYT API on port `8089`. Override those host ports with
+`VECTOR_SEARCH_PORT` and `SAYT_PORT` in `.env` if needed.
+
+Stop the containers again with:
+
+```bash
+make docker-down
+```
+
 ### Testing
 
 The project includes comprehensive test coverage:
@@ -158,6 +187,10 @@ The main settings include:
 For day-to-day use, it helps to think of the variables in two groups: runtime
 variables used by the APIs when they start, and build variables used by the
 local artifact-generation scripts.
+
+When using Docker Compose locally, `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR`
+should point to local artifact directories that can be bind-mounted into the
+containers.
 
 ### Runtime Variables
 
