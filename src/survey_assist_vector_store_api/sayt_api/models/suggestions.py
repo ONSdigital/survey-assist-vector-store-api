@@ -14,4 +14,10 @@ class SuggestionsRequest(BaseModel):
 class SuggestionsResponse(BaseModel):
     """Response payload for the SAYT suggestions route."""
 
+    suggestions: list[str]
+
+
+class ScoredSuggestionsResponse(BaseModel):
+    """Response payload for the SAYT scored-suggestions route."""
+
     suggestions: list[Suggestion]

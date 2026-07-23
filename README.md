@@ -149,7 +149,8 @@ Key endpoints:
 
 - Vector-store search: `POST /v1/search-index`, accepting cumulative query fragments in `query`
 - Vector-store configuration: `GET /v1/configuration`, returning the loaded embedding configuration
-- SAYT suggestions: `POST /v1/suggestions`, accepting `query` and optional `num_suggestions`, and returning them under `suggestions`
+- SAYT suggestions: `POST /v1/suggestions`, accepting `query` and optional `num_suggestions`, and returning plain display text under `suggestions`
+- SAYT scored suggestions: `POST /v1/scored-suggestions`, accepting the same request body and returning scored suggestions under `suggestions`
 - SAYT configuration: `GET /v1/configuration`, returning the loaded SAYT configuration
 
 ## Configuration
