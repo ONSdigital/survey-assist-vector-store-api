@@ -147,7 +147,7 @@ and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those local
 directories. For example, if you want to switch from SIC to SOC locally, update
 the directory variables in `.env` to the SOC artifact directories.
 
-The exact Compose service names are `vector-search-api` and `sayt-api`.
+The exact Compose service names are `vector-store-api` and `sayt-api`.
 
 Build the images:
 
@@ -158,7 +158,7 @@ make docker-build
 Or build just one service image:
 
 ```shell
-make docker-build service=vector-search-api
+make docker-build service=vector-store-api
 make docker-build service=sayt-api
 ```
 
@@ -171,7 +171,7 @@ make docker-up
 Or run just one service:
 
 ```shell
-make docker-up service=vector-search-api
+make docker-up service=vector-store-api
 make docker-up service=sayt-api
 ```
 

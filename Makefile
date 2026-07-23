@@ -79,11 +79,11 @@ colima-stop: ## Stop Colima
 	colima stop
 
 .PHONY: docker-build
-docker-build: ## Build container images; optionally set service=vector-search-api or service=sayt-api
+docker-build: ## Build container images; optionally set service=vector-store-api or service=sayt-api
 	docker compose build $(service)
 
 .PHONY: docker-up
-docker-up: ## Run API containers; optionally set service=vector-search-api or service=sayt-api
+docker-up: ## Run API containers; optionally set service=vector-store-api or service=sayt-api
 	docker compose up --build $(service)
 
 .PHONY: docker-down

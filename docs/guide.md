@@ -114,15 +114,15 @@ make docker-up
 You can also target a single Compose service:
 
 ```bash
-make docker-build service=vector-search-api
+make docker-build service=vector-store-api
 make docker-build service=sayt-api
-make docker-up service=vector-search-api
+make docker-up service=vector-store-api
 make docker-up service=sayt-api
 ```
 
 Before using Docker Compose, build the artifacts you want the containers to
 load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those
-local directories. The exact Compose service names are `vector-search-api` and
+local directories. The exact Compose service names are `vector-store-api` and
 `sayt-api`, while the exposed APIs remain the vector-store API on port `8088`
 and the SAYT API on port `8089`. Override those host ports with
 `VECTOR_SEARCH_PORT` and `SAYT_PORT` in `.env` if needed.

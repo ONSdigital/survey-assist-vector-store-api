@@ -1,12 +1,12 @@
 name: survey-assist-vector-store-api
 
 services:
-  vector-search-api:
+  vector-store-api:
     build:
       context: .
       dockerfile: Dockerfile
-      target: vector-search
-    image: survey-assist-vector-store-api/vector-search:local
+      target: vector-store
+    image: survey-assist-vector-store-api/vector-store:local
     restart: unless-stopped
     env_file:
       - .env

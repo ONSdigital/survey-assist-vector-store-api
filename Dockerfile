@@ -52,7 +52,7 @@ RUN chown -R appuser:appuser /app
 
 USER appuser
 
-FROM runtime-base AS vector-search
+FROM runtime-base AS vector-store
 
 EXPOSE 8088
 
