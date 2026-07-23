@@ -35,6 +35,9 @@ The main local endpoints are:
 The vector-store search endpoint accepts a `query` list of cumulative fragments.
 The SAYT suggestions endpoint accepts `query` plus optional `num_suggestions` and returns a JSON object whose `suggestions` field contains display-text strings.
 The SAYT scored-suggestions endpoint accepts the same request and returns scored suggestion objects under `suggestions`.
+For both SAYT endpoints, `num_suggestions` overrides the default for that
+request only. If it is omitted, the API uses the `MAX_SUGGESTIONS` value that
+was baked into the loaded SAYT artifact when it was built.
 
 ## Integration with Survey Assist API
 
@@ -155,6 +158,32 @@ The main settings include:
 - Vector-store artifact directory and result limits
 - SAYT artifact directory and build inputs
 - SAYT build parameters such as minimum characters and default suggestion limit
+
+For day-to-day use, it helps to think of the variables in two groups: runtime
+variables used by the APIs when they start, and build variables used by the
+local artifact-generation scripts.
+
+### Runtime Variables
+
+| Variable                 | Used by                                        | Required | Default         | Description                                                   |
+| ------------------------ | ---------------------------------------------- | -------- | --------------- | ------------------------------------------------------------- |
+| `VECTOR_STORE_DIR`       | Vector-store API and vector-store build script | No       | `vector_store`  | Directory or GCS URI for persisted vector-store artifacts.    |
+| `VECTOR_STORE_K_MATCHES` | Vector-store API                               | No       | `20`            | Maximum number of ranked matches returned per search request. |
+| `SAYT_ARTIFACT_DIR`      | SAYT API and SAYT build script                 | No       | `sayt_artifact` | Directory or GCS URI for persisted SAYT artifacts.            |
+
+### Build Variables
+
+| Variable               | Used by                                                               | Required                    | Default                  | Description                                                                                                    |
+| ---------------------- | --------------------------------------------------------------------- | --------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `INDEX_SOURCE_FILE`    | `make build-vector-store` / `scripts/build_vector_store_artifacts.py` | Yes for vector-store builds | None                     | Local path or GCS URI for the source data used to build vector-store artifacts.                                |
+| `EMBEDDING_MODEL_NAME` | `make build-vector-store` / `scripts/build_vector_store_artifacts.py` | No                          | embed-core default model | Embedding model override used during vector-store artifact generation.                                         |
+| `SAYT_SOURCE_FILE`     | `make build-sayt` / `scripts/build_sayt_artifacts.py`                 | Yes for SAYT builds         | None                     | Local path or GCS URI for the source CSV used to build SAYT artifacts.                                         |
+| `SEARCH_TEXT_COL`      | `make build-sayt` / `scripts/build_sayt_artifacts.py`                 | No                          | `search_text`            | CSV column used as the SAYT search text.                                                                       |
+| `DISPLAY_TEXT_COL`     | `make build-sayt` / `scripts/build_sayt_artifacts.py`                 | No                          | `display_text`           | CSV column used as the SAYT display text.                                                                      |
+| `MIN_CHARS`            | `make build-sayt` / `scripts/build_sayt_artifacts.py`                 | No                          | `4`                      | Minimum query length baked into the built SAYT artifact.                                                       |
+| `MAX_SUGGESTIONS`      | `make build-sayt` / `scripts/build_sayt_artifacts.py`                 | No                          | `10`                     | Default suggestion count baked into the built SAYT artifact and used when API requests omit `num_suggestions`. |
+
+The complete example file lives in the repository root as `.env.example`.
 
 ## Security
 
