@@ -5,7 +5,7 @@
 This repository hosts two related FastAPI services:
 
 - the vector-store API, which loads persisted embedding artifacts and serves ranked search results
-- the SAYT API, which loads persisted SAYT artifacts and serves scored typeahead suggestions
+- the SAYT API, which loads persisted SAYT artifacts and serves plain and scored search-as-you-type suggestions
 
 Both services share the same codebase, validation workflow, and local `.env` file, but they run as separate processes and expose separate OpenAPI docs.
 
