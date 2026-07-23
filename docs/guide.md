@@ -125,7 +125,7 @@ load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those
 local directories. The exact Compose service names are `vector-store-api` and
 `sayt-api`, while the exposed APIs remain the vector-store API on port `8088`
 and the SAYT API on port `8089`. Override those host ports with
-`VECTOR_SEARCH_PORT` and `SAYT_PORT` in `.env` if needed.
+`VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` if needed.
 
 Stop the containers again with:
 

@@ -13,7 +13,7 @@ services:
     environment:
       VECTOR_STORE_DIR: /app/${VECTOR_STORE_DIR:-vector_store}
     ports:
-      - "${VECTOR_SEARCH_PORT:-8088}:8088"
+      - "${VECTOR_STORE_PORT:-8088}:8088"
     volumes:
       - ./${VECTOR_STORE_DIR:-vector_store}:/app/${VECTOR_STORE_DIR:-vector_store}:ro
 

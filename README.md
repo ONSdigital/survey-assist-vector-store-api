@@ -186,7 +186,7 @@ By default, Docker Compose publishes:
 - vector-store API on `http://localhost:8088`
 - SAYT API on `http://localhost:8089`
 
-You can override those ports with `VECTOR_SEARCH_PORT` and `SAYT_PORT` in
+You can override those ports with `VECTOR_STORE_PORT` and `SAYT_PORT` in
 `.env`.
 
 ### API Documentation
