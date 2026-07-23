@@ -4,7 +4,7 @@
 
 This repository hosts two related FastAPI services:
 
-- the vector-search API, which loads persisted embedding artifacts and serves ranked search results
+- the vector-store API, which loads persisted embedding artifacts and serves ranked search results
 - the SAYT API, which loads persisted SAYT artifacts and serves scored typeahead suggestions
 
 Both services share the same codebase, validation workflow, and local `.env` file, but they run as separate processes and expose separate OpenAPI docs.
@@ -13,9 +13,9 @@ Both services share the same codebase, validation workflow, and local `.env` fil
 
 The repository is organised around two service entrypoints plus shared helpers:
 
-- `survey_assist_vector_store_api.vector_search_api.main:app` runs the vector-search API on port `8088`
+- `survey_assist_vector_store_api.vector_store_api.main:app` runs the vector-store API on port `8088`
 - `survey_assist_vector_store_api.sayt_api.main:app` runs the SAYT API on port `8089`
-- `scripts/build_vector_store_artifacts.py` builds embedding artifacts used by the vector-search API
+- `scripts/build_vector_store_artifacts.py` builds embedding artifacts used by the vector-store API
 - `scripts/build_sayt_artifacts.py` builds SAYT artifacts used by the SAYT API
 
 Shared modules under `src/survey_assist_vector_store_api/shared/` provide common FastAPI wiring, app metadata, and error handling.
@@ -24,13 +24,15 @@ Shared modules under `src/survey_assist_vector_store_api/shared/` provide common
 
 The main local endpoints are:
 
-- Vector-search docs: `http://localhost:8088/docs`
+- Vector-store docs: `http://localhost:8088/docs`
 - SAYT docs: `http://localhost:8089/docs`
-- Vector-search runtime config: `GET /v1/runtime-config`
-- SAYT runtime config: `GET /v1/runtime-config`
+- Vector-store search: `POST /v1/search-index`
+- Vector-store runtime config: `GET /v1/runtime-config`
 - SAYT suggestions: `POST /v1/suggest`
+- SAYT runtime config: `GET /v1/runtime-config`
 
-The SAYT suggestions endpoint returns a JSON array of scored suggestions.
+The vector-store search endpoint accepts a `query` list of cumulative fragments.
+The SAYT suggestions endpoint accepts `query` plus optional `num_suggestions` and returns a JSON array of scored suggestions.
 
 ## Integration with Survey Assist API
 
@@ -39,7 +41,7 @@ These services integrate with the Survey Assist API to provide:
 - Embedding-based similarity search for SIC code classification
 - Embedding-based similarity search for SOC code classification
 - Search-as-you-type suggestions for supported classification flows
-- Real-time status monitoring
+- Runtime configuration inspection for both services
 - Efficient artifact-backed retrieval
 
 ## Documentation
@@ -97,7 +99,7 @@ make build-sayt
 Run the services locally:
 
 ```bash
-make run-vector-search-api
+make run-vector-store-api
 make run-sayt-api
 ```
 
@@ -106,7 +108,7 @@ make run-sayt-api
 The project includes comprehensive test coverage:
 
 - API endpoint tests
-- Vector-search functionality tests
+- Vector-store functionality tests
 - SAYT functionality tests
 - Error handling tests
 
@@ -148,7 +150,7 @@ Configuration is managed through environment variables loaded from `.env`.
 The main settings include:
 
 - Embedding model selection
-- Vector-search artifact directory and result limits
+- Vector-store artifact directory and result limits
 - SAYT artifact directory and build inputs
 - SAYT build parameters such as minimum characters and default suggestion limit
 

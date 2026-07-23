@@ -7,7 +7,7 @@ import pytest
 from fastapi import FastAPI
 
 from survey_assist_vector_store_api.sayt_api import main as sayt_main_module
-from survey_assist_vector_store_api.vector_search_api import main as main_module
+from survey_assist_vector_store_api.vector_store_api import main as main_module
 from tests.helpers import create_test_app
 
 

@@ -18,7 +18,7 @@
 
 This repository now hosts two related FastAPI services used by Survey Assist:
 
-- a vector-search API backed by persisted embedding artifacts
+- a vector-store API backed by persisted embedding artifacts
 - a search-as-you-type (SAYT) API backed by persisted SAYT artifacts
 
 ## Table of Contents
@@ -43,8 +43,8 @@ This repository now hosts two related FastAPI services used by Survey Assist:
 ## Features
 
 - FastAPI endpoints
-- Industry (SIC) vector search
-- Occupation (SOC) vector search
+- Industry (SIC) search over persisted vector-store artifacts
+- Occupation (SOC) search over persisted vector-store artifacts
 - Search-as-you-type suggestion serving
 - Artifact build scripts for both service types
 - API documentation
@@ -59,7 +59,7 @@ The services in this repository consist of:
 - all-MiniLM-L6-v2 used for embeddings where required
 - Deployed as Google Cloud Run services
 
-Depending on configuration and entrypoint, the code can deploy vector-search or SAYT serving workloads.
+Depending on configuration and entrypoint, the code can deploy vector-store or SAYT serving workloads.
 
 **Important** - In the deployed solution, this service is private to GCP services, it will only be called via the main Survey Assist API.
 
@@ -102,7 +102,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 ### Build Artifacts
 
-Build the vector-search artifacts:
+Build the vector-store artifacts:
 
 ```shell
 make build-vector-store
@@ -124,10 +124,10 @@ poetry run python scripts/build_sayt_artifacts.py --help
 
 ### Start Applications
 
-Run the vector-search API:
+Run the vector-store API:
 
 ```shell
-make run-vector-search-api
+make run-vector-store-api
 ```
 
 Run the SAYT API:
@@ -138,7 +138,7 @@ make run-sayt-api
 
 ### API Documentation
 
-Vector-search docs: http://localhost:8088/docs
+Vector-store docs: http://localhost:8088/docs
 
 SAYT docs: http://localhost:8089/docs
 
@@ -147,9 +147,10 @@ The OpenAPI descriptions include the installed package versions for
 
 Key runtime endpoints:
 
-- Vector-search runtime configuration: `GET /v1/runtime-config`
-- SAYT runtime configuration: `GET /v1/runtime-config`
-- SAYT suggestions: `POST /v1/suggest`, returning a JSON array of scored suggestions
+- Vector-store search: `POST /v1/search-index`, accepting cumulative query fragments in `query`
+- Vector-store runtime configuration: `GET /v1/runtime-config`, returning the loaded embedding configuration
+- SAYT suggestions: `POST /v1/suggest`, accepting `query` and optional `num_suggestions`
+- SAYT runtime configuration: `GET /v1/runtime-config`, returning the loaded SAYT configuration
 
 ## Configuration
 
@@ -164,7 +165,7 @@ Copy `.env.example` to `.env` and adjust values for your environment. The same
 | EMBEDDING_MODEL_NAME   | Embedding model override for vector-store artifact generation                  | No                  | Defaults to the embed-core model if omitted                                       |
 | SAYT_ARTIFACT_DIR      | Directory or GCS URI for persisted SAYT artifacts                              | No                  | Defaults to `sayt_artifact`; used by the SAYT API and build script                |
 | SAYT_SOURCE_FILE       | Local path or GCS URI for the source CSV used to build SAYT artifacts          | Only for build step | Required by `make build-sayt` / `scripts/build_sayt_artifacts.py`                 |
-| SEARCH_TEXT_COL        | CSV column used as SAYT search text                                            | No                  | Defaults to `title`                                                               |
+| SEARCH_TEXT_COL        | CSV column used as SAYT search text                                            | No                  | Defaults to `search_text`                                                         |
 | DISPLAY_TEXT_COL       | Optional CSV column used as SAYT display text                                  | No                  | Defaults to the search-text column when omitted                                   |
 | MIN_CHARS              | Minimum query length baked into built SAYT artifacts                           | No                  | Defaults to `4`                                                                   |
 | MAX_SUGGESTIONS        | Default suggestion count baked into built SAYT artifacts                       | No                  | Defaults to `10`                                                                  |

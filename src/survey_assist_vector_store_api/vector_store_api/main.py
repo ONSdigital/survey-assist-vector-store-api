@@ -7,13 +7,13 @@ from survey_assist_vector_store_api.shared.app_metadata import (
     build_default_app_description,
 )
 from survey_assist_vector_store_api.shared.fastapi_app import AppMetadata, create_app
-from survey_assist_vector_store_api.vector_search_api.lifespan import (
+from survey_assist_vector_store_api.vector_store_api.lifespan import (
     vector_store_lifespan,
 )
-from survey_assist_vector_store_api.vector_search_api.routes.runtime_config import (
+from survey_assist_vector_store_api.vector_store_api.routes.runtime_config import (
     router as runtime_config_router,
 )
-from survey_assist_vector_store_api.vector_search_api.routes.search_index import (
+from survey_assist_vector_store_api.vector_store_api.routes.search_index import (
     router as search_index_router,
 )
 

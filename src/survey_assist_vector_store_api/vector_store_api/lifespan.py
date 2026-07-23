@@ -5,8 +5,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from survey_assist_vector_store_api.vector_search_api.deps.settings import get_settings
-from survey_assist_vector_store_api.vector_search_api.deps.vector_store import (
+from survey_assist_vector_store_api.vector_store_api.deps.settings import get_settings
+from survey_assist_vector_store_api.vector_store_api.deps.vector_store import (
     load_embedding_handler,
 )
 

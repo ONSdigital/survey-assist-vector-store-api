@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from survey_assist_embed_core import EmbeddingHandler
 from survey_assist_embed_core.models import EmbeddingStatus
 
-from survey_assist_vector_store_api.vector_search_api.deps.vector_store import (
+from survey_assist_vector_store_api.vector_store_api.deps.vector_store import (
     get_embedding_handler,
 )
 

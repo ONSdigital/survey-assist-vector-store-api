@@ -4,10 +4,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from survey_assist_vector_store_api.vector_search_api.deps import (
+from survey_assist_vector_store_api.vector_store_api.deps import (
     vector_store as vector_store_module,
 )
-from survey_assist_vector_store_api.vector_search_api.deps.settings import (
+from survey_assist_vector_store_api.vector_store_api.deps.settings import (
     RuntimeVectorStoreSettings,
 )
 

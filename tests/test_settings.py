@@ -2,7 +2,7 @@
 
 import pytest
 
-from survey_assist_vector_store_api.vector_search_api.deps.settings import (
+from survey_assist_vector_store_api.vector_store_api.deps.settings import (
     RuntimeVectorStoreSettings,
     get_settings,
 )
