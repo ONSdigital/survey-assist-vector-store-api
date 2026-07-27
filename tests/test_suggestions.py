@@ -93,24 +93,20 @@ def test_scored_suggestions_route_uses_suggester_from_request_state(
 
 
 @pytest.mark.api
-def test_suggestions_route_accepts_null_query(
+@pytest.mark.parametrize("endpoint", ["/v1/suggestions", "/v1/scored-suggestions"])
+def test_suggestions_routes_reject_null_query(
     create_sayt_app_with_suggester,
+    endpoint: str,
 ) -> None:
-    """Verify that the route passes null queries through to the suggester."""
+    """Verify that null queries are rejected at the API boundary."""
     fake_suggester = FakeSuggester()
     app = create_sayt_app_with_suggester(fake_suggester)
 
     with TestClient(app) as client:
-        response = client.post("/v1/suggestions", json={"query": None})
+        response = client.post(endpoint, json={"query": None})
 
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {
-        "suggestions": [
-            "Software developer",
-            "Software engineer",
-        ]
-    }
-    assert fake_suggester.suggest_calls == [(None, None)]
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert not fake_suggester.suggest_calls
     assert not fake_suggester.suggest_with_scores_calls
 
 

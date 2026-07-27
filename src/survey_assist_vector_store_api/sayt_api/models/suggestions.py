@@ -7,8 +7,8 @@ from survey_assist_embed_core.sayt import Suggestion
 class SuggestionsRequest(BaseModel):
     """Payload for the SAYT suggestions route."""
 
-    query: str | None = Field(
-        default=None,
+    query: str = Field(
+        ...,
         description="Raw query text used to retrieve suggestions.",
     )
     num_suggestions: int | None = Field(
