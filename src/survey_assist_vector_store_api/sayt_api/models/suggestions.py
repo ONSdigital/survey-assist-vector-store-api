@@ -1,6 +1,6 @@
 """Request and response models for SAYT suggestions endpoints."""
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 from survey_assist_embed_core.sayt import Suggestion
 
 
@@ -11,9 +11,10 @@ class SuggestionsRequest(BaseModel):
         ...,
         description="Raw query text used to retrieve suggestions.",
     )
-    num_suggestions: int | None = Field(
+    limit: int | None = Field(
         default=None,
         gt=0,
+        validation_alias=AliasChoices("limit", "num_suggestions"),
         description=(
             "Optional positive per-request suggestion limit. When omitted, "
             "the loaded SAYT artifact's built-in default is used, which is "

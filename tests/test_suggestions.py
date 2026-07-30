@@ -40,7 +40,7 @@ def test_suggestions_route_uses_suggester_from_request_state(
     with TestClient(app) as client:
         response = client.post(
             "/v1/suggestions",
-            json={"query": "soft", "num_suggestions": 2},
+            json={"query": "soft", "limit": 2},
         )
 
     assert response.status_code == status.HTTP_200_OK
@@ -50,6 +50,24 @@ def test_suggestions_route_uses_suggester_from_request_state(
             {"display_text": "Software engineer", "score": 0.91},
         ]
     }
+    assert fake_suggester.suggest_with_scores_calls == [("soft", 2)]
+
+
+@pytest.mark.api
+def test_suggestions_route_accepts_legacy_num_suggestions_key(
+    create_sayt_app_with_suggester,
+) -> None:
+    """Verify that the renamed API field still accepts the previous key."""
+    fake_suggester = FakeSuggester()
+    app = create_sayt_app_with_suggester(fake_suggester)
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/suggestions",
+            json={"query": "soft", "num_suggestions": 2},
+        )
+
+    assert response.status_code == status.HTTP_200_OK
     assert fake_suggester.suggest_with_scores_calls == [("soft", 2)]
 
 
@@ -69,19 +87,19 @@ def test_suggestions_route_rejects_null_query(
 
 
 @pytest.mark.api
-@pytest.mark.parametrize("num_suggestions", [0, -1])
-def test_suggestions_route_requires_positive_num_suggestions(
+@pytest.mark.parametrize("limit", [0, -1])
+def test_suggestions_route_requires_positive_limit(
     create_sayt_app_with_suggester,
-    num_suggestions: int,
+    limit: int,
 ) -> None:
-    """Verify that num_suggestions must be a positive integer when provided."""
+    """Verify that limit must be a positive integer when provided."""
     fake_suggester = FakeSuggester()
     app = create_sayt_app_with_suggester(fake_suggester)
 
     with TestClient(app) as client:
         response = client.post(
             "/v1/suggestions",
-            json={"query": "soft", "num_suggestions": num_suggestions},
+            json={"query": "soft", "limit": limit},
         )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT

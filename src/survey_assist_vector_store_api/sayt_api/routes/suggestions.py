@@ -23,6 +23,6 @@ def suggest(
     return SuggestionsResponse(
         suggestions=suggester.suggest_with_scores(
             payload.query,
-            num_suggestions=payload.num_suggestions,
+            num_suggestions=payload.limit,
         )
     )

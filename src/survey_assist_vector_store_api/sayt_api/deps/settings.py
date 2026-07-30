@@ -51,7 +51,7 @@ class BuildSaytArtifactsSettings(BaseBuildSettings):
         le=100,
         description=(
             "Default suggestion count baked into the built SAYT artifact and "
-            "used when requests omit num_suggestions."
+            "used when requests omit limit."
         ),
         validation_alias=AliasChoices(
             "default_suggestions",
