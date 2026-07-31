@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile
       target: vector-store
     image: survey-assist-vector-store-api/vector-store:local
-    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -23,7 +22,6 @@ services:
       dockerfile: Dockerfile
       target: sayt
     image: survey-assist-vector-store-api/sayt:local
-    restart: unless-stopped
     env_file:
       - .env
     environment:
