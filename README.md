@@ -138,46 +138,15 @@ make run-sayt-api
 
 ### Run Containerised Services
 
-The repository also includes a root `compose.yaml` and a root multi-stage
-`Dockerfile` that builds separate vector-store and SAYT runtime images from
-the same dependency base.
+The repository includes a root `compose.yaml` and a root multi-stage
+`Dockerfile` for running the vector-store and SAYT APIs locally with Docker
+Compose.
 
-Before using Docker Compose, build the artifacts you want the services to load
-and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those local
-directories. For example, if you want to switch from SIC to SOC locally, update
-the directory variables in `.env` to the SOC artifact directories.
-
-The exact Compose service names are `vector-store-api` and `sayt-api`.
-
-Build the images:
+Build the images, start the services, and stop them again with:
 
 ```shell
 make docker-build
-```
-
-Or build just one service image:
-
-```shell
-make docker-build service=vector-store-api
-make docker-build service=sayt-api
-```
-
-Start both services:
-
-```shell
 make docker-up
-```
-
-Or run just one service:
-
-```shell
-make docker-up service=vector-store-api
-make docker-up service=sayt-api
-```
-
-Stop them again:
-
-```shell
 make docker-down
 ```
 
@@ -186,8 +155,8 @@ By default, Docker Compose publishes:
 - vector-store API on `http://localhost:8088`
 - SAYT API on `http://localhost:8089`
 
-You can override those ports with `VECTOR_STORE_PORT` and `SAYT_PORT` in
-`.env`.
+For single-service runs, artifact-directory setup, and port overrides, see
+[the guide setup section](docs/guide.md#setup).
 
 ### API Documentation
 
@@ -224,10 +193,6 @@ The highest-signal variables are:
 For the full runtime/build variable matrix, defaults, and notes about how
 `limit` interacts with `DEFAULT_NUM_SUGGESTIONS`, see
 [the guide configuration section](docs/guide.md#configuration).
-
-When using Docker Compose locally, `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR`
-should point to local artifact directories that can be bind-mounted into the
-containers.
 
 ## Repository Structure
 
