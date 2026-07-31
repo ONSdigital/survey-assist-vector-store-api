@@ -1,6 +1,6 @@
 [project]
 name = "survey-assist-vector-store-api"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = [{ name = "Steve Gibbard", email = "steve.gibbard@ons.gov.uk" }]
 readme = "README.md"
