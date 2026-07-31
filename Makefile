@@ -94,6 +94,14 @@ docker-down: ## Stop the running API containers
 docker-clean: ## Clean Docker resources
 	DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock" docker system prune -f
 
+.PHONY: podman-up
+podman-up: ## Run API containers; optionally set service=vector-store-api or service=sayt-api
+	podman compose up --build $(service)
+
+.PHONY: podman-down
+podman-down: ## Stop the running API containers
+	podman compose down
+
 .PHONY: colima-status
 colima-status: ## Check Colima status
 	colima status
