@@ -1,28 +1,37 @@
 # Survey Assist Vector Store API
 
-This is a FastAPI-based service that provides vector storage and similarity search capabilities for Standard Industrial Classification (SIC) codes, Standard Occupation Classification (SOC) codes and Search As You Type functionality (SAYT). It serves as a backend service for the Survey Assist API, enabling efficient semantic search and classification of business descriptions.
+This repository provides two FastAPI services used by Survey Assist:
+
+- a vector-store API backed by persisted embedding artifacts for SIC and SOC search
+- a search-as-you-type (SAYT) API backed by persisted SAYT artifacts
+
+Both services are intended to be deployed as private backend services behind the main Survey Assist API.
 
 ## Key Features
 
-- **Vector Storage**: Efficient storage of mbeddings
-- **Semantic Search**: Similarity-based search
-- **Status Monitoring**: Real-time status checking of embeddings and service health
-- **Interactive Documentation**: Built-in Swagger UI and ReDoc documentation
-- **Integration Ready**: Designed to work seamlessly with the Survey Assist API
+- **Vector-store Retrieval**: Similarity-based SIC and SOC retrieval from built embedding artifacts
+- **SAYT Suggestions**: Low-latency search-as-you-type suggestions from built SAYT artifacts
+- **Configuration Endpoints**: Service-level config visibility for local debugging and operations
+- **Artifact Build Scripts**: Local commands for creating vector-store and SAYT artifacts
+- **Interactive Documentation**: Built-in Swagger UI and ReDoc for each service
 
 ## API Documentation
 
-The API documentation is available in two formats:
-- **Swagger UI**: Interactive documentation at `/docs`
-- **ReDoc**: Alternative documentation view at `/redoc`
+When running locally, each service exposes its own interactive documentation:
+
+- Vector-store Swagger UI: `http://localhost:8088/docs`
+- Vector-store ReDoc: `http://localhost:8088/redoc`
+- SAYT Swagger UI: `http://localhost:8089/docs`
+- SAYT ReDoc: `http://localhost:8089/redoc`
 
 ## Getting Started
 
-For detailed information on installation, setup, and usage, please refer to the [Guide](guide.md).
+For setup, configuration, and local development commands, see the [Guide](guide.md).
 
 ## Development
 
 The project includes comprehensive test coverage and follows strict code quality standards:
+
 - Static type checking
 - Code linting and formatting
 - Security analysis

@@ -1,8 +1,5 @@
 """Tests for the vector-store artifact build script."""
 
-import importlib.util
-import runpy
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,6 +7,8 @@ import pytest
 from survey_assist_embed_core.adapters.classifai.vector_backend import (
     DEFAULT_CLASSIFAI_EMBEDDING_MODEL_NAME,
 )
+
+from tests.helpers import load_script_module, run_script_as_main, set_script_argv
 
 SCRIPT_ENV_VARS = (
     "INDEX_SOURCE_FILE",
@@ -41,22 +40,10 @@ def _clear_script_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def _load_script_module():
     """Load the build script directly from the repository scripts directory."""
-    script_path = (
-        Path(__file__).resolve().parents[1]
-        / "scripts"
-        / "build_vector_store_artifacts.py"
+    return load_script_module(
+        script_name="build_vector_store_artifacts.py",
+        module_name="build_vector_store_artifacts_script",
     )
-    spec = importlib.util.spec_from_file_location(
-        "build_vector_store_artifacts_script",
-        script_path,
-    )
-    if spec is None or spec.loader is None:
-        raise RuntimeError("Unable to load build_vector_store_artifacts.py")
-
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
 
 
 @pytest.fixture(name="script")
@@ -75,7 +62,7 @@ def _set_script_argv(
     *args: str,
 ) -> None:
     """Set sys.argv to mimic invoking the build script from the shell."""
-    monkeypatch.setattr(sys, "argv", ["build_vector_store_artifacts.py", *args])
+    set_script_argv(monkeypatch, "build_vector_store_artifacts.py", *args)
 
 
 @pytest.mark.utils
@@ -85,11 +72,6 @@ def test_script_runs_main_when_executed_as_main_module(
 ) -> None:
     """Verify that the __main__ entrypoint delegates to main and exits cleanly."""
     calls: list[dict[str, str]] = []
-    script_path = (
-        Path(__file__).resolve().parents[1]
-        / "scripts"
-        / "build_vector_store_artifacts.py"
-    )
 
     def fake_info(*_args, **_kwargs) -> None:
         """Ignore info logs during the test."""
@@ -114,10 +96,7 @@ def test_script_runs_main_when_executed_as_main_module(
         fake_get_logger,
     )
 
-    with pytest.raises(SystemExit) as exc_info:
-        runpy.run_path(str(script_path), run_name="__main__")
-
-    assert exc_info.value.code == 0
+    assert run_script_as_main("build_vector_store_artifacts.py") == 0
     assert calls == [
         {
             "index_source_file": "data/source.csv",

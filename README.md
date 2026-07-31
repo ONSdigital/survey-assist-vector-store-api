@@ -16,7 +16,10 @@
 
 ## Overview
 
-A generic vector store and api used by survey assist. This can deploy either an industry, occupation or search as you type vector store.
+This repository now hosts two related FastAPI services used by Survey Assist:
+
+- a vector-store API backed by persisted embedding artifacts
+- a search-as-you-type (SAYT) API backed by persisted SAYT artifacts
 
 ## Table of Contents
 
@@ -35,25 +38,28 @@ A generic vector store and api used by survey assist. This can deploy either an 
 - [Contributing](#contributing)
 - [License](#license)
 - [Maintainers](#maintainers)
+- [Additional Documentation](#additional-documentation)
 
 ## Features
 
 - FastAPI endpoints
-- Industry (SIC) vector search
-- Occupation (SOC) vector search
-- Vector store integration
-- API Documentation
+- Industry (SIC) search over persisted vector-store artifacts
+- Occupation (SOC) search over persisted vector-store artifacts
+- Search-as-you-type suggestion serving
+- Artifact build scripts for both service types
+- API documentation
 
 ## Architecture
 
-The vector store API consists of:
+The services in this repository consist of:
 
 - FastAPI endpoints
-- ClassifAI used for vector store
-- all-MiniLM-L6-v2 used for embeddings
-- Deployed as a Google Cloud Run service
+- ClassifAI used for vector-store retrieval artifacts
+- SAYT retrieval components from `survey-assist-embed-core`
+- all-MiniLM-L6-v2 used for embeddings where required
+- Deployed as Google Cloud Run services
 
-Depending upon configuration the code will deploy and industry, occupation or search as you type vector store.
+Depending on configuration and entrypoint, the code can deploy vector-store or SAYT serving workloads.
 
 **Important** - In the deployed solution, this service is private to GCP services, it will only be called via the main Survey Assist API.
 
@@ -94,30 +100,77 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
 
 ## Running Locally
 
-### Start Application
+### Build Artifacts
 
-make run-vector-store
+Build the vector-store artifacts:
+
+```shell
+make build-vector-store
+```
+
+Build the SAYT artifacts:
+
+```shell
+make build-sayt
+```
+
+You can also run the build scripts directly and inspect their supported CLI
+flags with `--help`:
+
+```shell
+poetry run python scripts/build_vector_store_artifacts.py --help
+poetry run python scripts/build_sayt_artifacts.py --help
+```
+
+### Start Applications
+
+Run the vector-store API:
+
+```shell
+make run-vector-store-api
+```
+
+Run the SAYT API:
+
+```shell
+make run-sayt-api
+```
 
 ### API Documentation
 
-http://localhost:8080/docs
+Vector-store docs: http://localhost:8088/docs
 
-The OpenAPI description includes the installed package versions for
-`survey-assist-vector-store-api` and `survey-assist-embed-core`. Runtime
-embedding configuration is available from `GET /v1/runtime-config`.
+SAYT docs: http://localhost:8089/docs
+
+The OpenAPI descriptions include the installed package versions for
+`survey-assist-vector-store-api` and `survey-assist-embed-core`.
+
+Key endpoints:
+
+- Vector-store search: `POST /v1/search-index`, accepting cumulative query fragments in `query`
+- Vector-store configuration: `GET /v1/configuration`, returning the loaded embedding configuration
+- SAYT suggestions: `POST /v1/suggestions`, accepting `query` and optional positive `limit`, and returning scored suggestions under `suggestions`
+- SAYT configuration: `GET /v1/configuration`, returning the loaded SAYT configuration
+
+For the SAYT suggestions endpoint, `limit` is an optional positive per-request
+override. If it is omitted, the API falls back to the default baked into the
+loaded SAYT artifact, which is set by `DEFAULT_NUM_SUGGESTIONS` when the
+artifact is built.
 
 ## Configuration
 
 Copy `.env.example` to `.env` and adjust values for your environment. The same
-`.env` file is used by the API runtime settings and the vector-store build
-script.
+`.env` file is used by both API runtimes and both local artifact-build scripts.
 
-| Variable               | Description                                                                    | Required            | Notes                                                                             |
-| ---------------------- | ------------------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------- |
-| VECTOR_STORE_DIR       | Directory or GCS URI for persisted vector-store artifacts                      | No                  | Defaults to `vector_store`; shared by the API and build script                    |
-| VECTOR_STORE_K_MATCHES | Maximum number of ranked matches returned per search request                   | No                  | Defaults to `20`                                                                  |
-| INDEX_SOURCE_FILE      | Local path or GCS URI for the source data used to build vector-store artifacts | Only for build step | Required by `make build-vector-store` / `scripts/build_vector_store_artifacts.py` |
-| EMBEDDING_MODEL_NAME   | Embedding model override for vector-store artifact generation                  | No                  | Defaults to the embed-core model if omitted                                       |
+The highest-signal variables are:
+
+- `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` for the runtime artifact locations
+- `INDEX_SOURCE_FILE` for vector-store builds
+- `SAYT_SOURCE_FILE`, `SEARCH_TEXT_COL`, `DISPLAY_TEXT_COL`, `MIN_CHARS`, and `DEFAULT_NUM_SUGGESTIONS` for SAYT builds
+
+For the full runtime/build variable matrix, defaults, and notes about how
+`limit` interacts with `DEFAULT_NUM_SUGGESTIONS`, see
+[the guide configuration section](docs/guide.md#configuration).
 
 ## Repository Structure
 
@@ -174,15 +227,27 @@ Documentation is maintained using MkDocs.
 make run-docs
 ```
 
+## Release Process
+
+Release guidance is documented in [RELEASING.md](RELEASING.md).
+
 ## Contributing
 
 Please read [the contribution guidelines](CONTRIBUTING.md) before creating a pull request.
 
+## License
+
+This project is licensed under the terms in [LICENSE](LICENSE).
+
+## Maintainers
+
+Repository ownership and review responsibility are listed in [CODEOWNERS](CODEOWNERS).
+
 ## Additional Documentation
 
-[CONTRIBUTING.md](CONTRIBUTING.md)
-[RELEASING.md](RELEASING.md)
-[SECURITY.md](SECURITY.md)
-[CHANGELOG.md](CHANGELOG.md)
-[LICENSE.md](LICENSE.md)
-[CODEOWNERS.md](CODEOWNERS.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [RELEASING.md](RELEASING.md)
+- [SECURITY.md](SECURITY.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [LICENSE](LICENSE)
+- [CODEOWNERS](CODEOWNERS)

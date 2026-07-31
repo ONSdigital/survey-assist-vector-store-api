@@ -217,5 +217,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Vector store artifacts
+# Default vector store artifact directories
 vector_store/
+sayt_artifact/
