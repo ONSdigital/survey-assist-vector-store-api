@@ -1,0 +1,32 @@
+name: survey-assist-vector-store-api
+
+services:
+  vector-store-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: vector-store
+    image: survey-assist-vector-store-api/vector-store:local
+    env_file:
+      - .env
+    environment:
+      VECTOR_STORE_DIR: /app/${VECTOR_STORE_DIR:-vector_store}
+    ports:
+      - "${VECTOR_STORE_PORT:-8088}:8088"
+    volumes:
+      - ./${VECTOR_STORE_DIR:-vector_store}:/app/${VECTOR_STORE_DIR:-vector_store}:ro
+
+  sayt-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: sayt
+    image: survey-assist-vector-store-api/sayt:local
+    env_file:
+      - .env
+    environment:
+      SAYT_ARTIFACT_DIR: /app/${SAYT_ARTIFACT_DIR:-sayt_artifact}
+    ports:
+      - "${SAYT_PORT:-8089}:8089"
+    volumes:
+      - ./${SAYT_ARTIFACT_DIR:-sayt_artifact}:/app/${SAYT_ARTIFACT_DIR:-sayt_artifact}:ro

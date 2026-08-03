@@ -104,6 +104,76 @@ make run-vector-store-api
 make run-sayt-api
 ```
 
+#### Container prerequisites
+Before using Docker or Podman Compose, build the artifacts you want the containers to
+load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those
+local directories. The exact Compose service names are `vector-store-api` and
+`sayt-api`, while the exposed APIs remain the vector-store API on port `8088`
+and the SAYT API on port `8089`. Override those host ports with
+`VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` if needed.
+
+#### Run the services with Docker Compose
+
+```bash
+make docker-build
+make docker-up
+```
+
+You can also target a single Compose service:
+
+```bash
+make docker-build service=vector-store-api
+make docker-build service=sayt-api
+make docker-up service=vector-store-api
+make docker-up service=sayt-api
+```
+
+Stop the containers again with:
+
+```bash
+make docker-down
+```
+
+#### Run the services with Podman
+
+##### Podman resource requirements
+
+Loading the SAYT semantic model and persisted indexes may exceed the default
+Podman machine memory allocation. For representative datasets, allocate at
+least 8 GiB memory and enable swap:
+
+```shell
+podman machine init \
+  --disk-size 100 \
+  --cpus 7 \
+  --memory 8192 \
+  --swap 2048
+```
+
+Build and run both services:
+
+```bash
+make podman-up
+```
+
+Build and run sayt service:
+
+```bash
+podman compose up --build sayt-api
+```
+
+Build and run the vector-store service:
+
+```bash
+podman compose up --build vector-store-api
+```
+
+Stop the containers with:
+
+```bash
+make docker-down
+```
+
 ### Testing
 
 The project includes comprehensive test coverage:
@@ -158,6 +228,10 @@ The main settings include:
 For day-to-day use, it helps to think of the variables in two groups: runtime
 variables used by the APIs when they start, and build variables used by the
 local artifact-generation scripts.
+
+When using Docker Compose locally, `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR`
+should point to local artifact directories that can be bind-mounted into the
+containers.
 
 ### Runtime Variables
 

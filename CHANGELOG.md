@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merge of sic-classification-vector-store to the repo and deprecation of original code
 - Merge of soc-classification-vector-store to the repo and deprecation of original code
 
+## [0.1.1] - 2026-07-31
+
+### Added
+
+- Local container workflow for running the vector-store and SAYT APIs using
+  Docker Compose.
+- APIs for sayt and vector-store services
+
+
 ## [0.1.0] - 2026-06-17
 
 ### Added

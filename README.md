@@ -136,6 +136,40 @@ Run the SAYT API:
 make run-sayt-api
 ```
 
+### Run Containerised Services
+
+The repository includes a root `compose.yaml` and a root multi-stage
+`Dockerfile` for running the vector-store and SAYT APIs locally with Docker
+Compose.
+
+#### Using Docker
+Build the images, start the services, and stop them again with:
+
+```shell
+make docker-build
+make docker-up
+make docker-down
+```
+
+#### Using Podman
+
+Note, you may need to increase the default podman machine config to run these services - see [the guide setup section](docs/guide.md#setup) for more details.
+
+```shell
+make podman-up
+make podman-down
+```
+
+#### Further Information
+
+By default, Docker or Podman Compose publishes:
+
+- vector-store API on `http://localhost:8088`
+- SAYT API on `http://localhost:8089`
+
+For single-service runs, artifact-directory setup, and port overrides, see
+[the guide setup section](docs/guide.md#setup).
+
 ### API Documentation
 
 Vector-store docs: http://localhost:8088/docs
