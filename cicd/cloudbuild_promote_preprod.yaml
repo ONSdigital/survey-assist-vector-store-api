@@ -10,7 +10,7 @@ steps:
 
         preprod_config=$(gcloud parametermanager parameters versions describe preprod --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
         SAYT_API_IMAGE_RELEASES=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-image'])")
-        SAYT_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
+        SAYT_API_URL=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
         TARGET_PROJECT_ID=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
         
         echo === Pulling image dev image with tag $SHORT_SHA ===
