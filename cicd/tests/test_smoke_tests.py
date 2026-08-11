@@ -32,14 +32,12 @@ class TestSaytApi:  # pylint: disable=too-few-public-methods
         print(f"Calling {endpoint}...")
         response = requests.post(
             endpoint,
-            json={
-                "query":"soft"
-            },
+            json={"query": "soft"},
             headers={"Authorization": f"Bearer {self.id_token}"},
             timeout=30,
         )
 
         print("Checking status code is 200..")
-        assert (
+        assert (  # noqa: S101
             response.status_code == 200  # noqa: PLR2004
         ), f"Expected status code 200, but got {response.status_code}."
