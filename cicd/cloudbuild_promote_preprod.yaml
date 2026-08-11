@@ -22,7 +22,7 @@ steps:
         docker push $$SAYT_API_IMAGE_RELEASES:latest
 
         echo === Deploy SAYT API ===
-        gcloud run deploy sayt-api --image=$$SAYT_API_IMAGE_RELEASES:$TAG_NAME --region $LOCATION --project $$TARGET_PROJECT_ID
+        gcloud run deploy sayt-vector-store --image=$$SAYT_API_IMAGE_RELEASES:$TAG_NAME --region $LOCATION --project $$TARGET_PROJECT_ID
 
         echo === Run smoke tests ===
         export TARGET_ENVIRONMENT=$_ENV_NAME
