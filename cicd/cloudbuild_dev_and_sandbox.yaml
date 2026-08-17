@@ -11,7 +11,7 @@ steps:
         python --version
         poetry --version
 
-        echo === Install dependencies for tests ===
+        echo === Install dependencies ===
         make install
 
         echo === Running unit tests ===
