@@ -11,25 +11,26 @@ steps:
         python --version
         poetry --version
 
-        echo === Install dependencies ===
-        make install
-
-        echo === Running unit tests ===
-        poetry run poetry run pytest -q --maxfail=1 --disable-warnings --cov=src/$(PKG) --cov-report term-missing --cov-fail-under=80 | tee coverage-report.txt
-        if grep -q "FAIL Required test coverage" coverage-report.txt; then
-          echo "ERROR: Target coverage was not reached, stopping pipeline."
-          exit 1
-        fi
-
-        echo === Download index and structure files from GCS ===
-        gsutil cp -r gs://survey-assist-sandbox-cloud-run-services/sayt_vector_store_config/sayt_artifact src/
-
         echo === Looking up config from parameter store ===
         config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
         SAYT_API_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-image'])")
         SAYT_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
         TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
-       
+        CR_BUCKET=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-bucket'])")
+
+        echo === Download index and structure files from GCS ===
+        gsutil cp -r gs://$$CR_BUCKET/sayt_vector_store_config/sayt_artifact src/
+
+        echo === Install dependencies ===
+        poetry install
+
+        echo === Running unit tests ===
+        poetry run pytest --ignore=cicd -q --maxfail=1 --disable-warnings --cov-report term-missing --cov-fail-under=80 | tee coverage-report.txt
+        if grep -q "FAIL Required test coverage" coverage-report.txt; then
+          echo "ERROR: Target coverage was not reached, stopping pipeline."
+          exit 1
+        fi
+
         echo === Build Docker image, tag and push to GAR ===
         docker build -t $$SAYT_API_IMAGE:$SHORT_SHA -t $$SAYT_API_IMAGE:latest .
         docker push $$SAYT_API_IMAGE:latest
