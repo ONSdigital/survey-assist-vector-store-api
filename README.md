@@ -136,6 +136,15 @@ Run the SAYT API:
 make run-sayt-api
 ```
 
+Direct `make` runs also read these values from `.env`. Exported shell
+variables and `make VAR=value` overrides take precedence. Docker and Podman
+Compose read the same values from `.env` or your shell environment:
+
+```shell
+make run-vector-store-api VECTOR_STORE_DIR=vector_store_soc VECTOR_STORE_PORT=8089
+SAYT_ARTIFACT_DIR=sayt_artifact_soc SAYT_PORT=8091 make run-sayt-api
+```
+
 ### Run Containerised Services
 
 The repository includes a root `compose.yaml` and a root multi-stage
@@ -143,6 +152,7 @@ The repository includes a root `compose.yaml` and a root multi-stage
 Compose.
 
 #### Using Docker
+
 Build the images, start the services, and stop them again with:
 
 ```shell
@@ -165,7 +175,7 @@ make podman-down
 By default, Docker or Podman Compose publishes:
 
 - vector-store API on `http://localhost:8088`
-- SAYT API on `http://localhost:8089`
+- SAYT API on `http://localhost:8090`
 
 For single-service runs, artifact-directory setup, and port overrides, see
 [the guide setup section](docs/guide.md#setup).
@@ -174,7 +184,7 @@ For single-service runs, artifact-directory setup, and port overrides, see
 
 Vector-store docs: http://localhost:8088/docs
 
-SAYT docs: http://localhost:8089/docs
+SAYT docs: http://localhost:8090/docs
 
 The OpenAPI descriptions include the installed package versions for
 `survey-assist-vector-store-api` and `survey-assist-embed-core`.

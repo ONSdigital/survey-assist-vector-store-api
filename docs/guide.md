@@ -14,7 +14,7 @@ Both services share the same codebase, validation workflow, and local `.env` fil
 The repository is organised around two service entrypoints plus shared helpers:
 
 - `survey_assist_vector_store_api.vector_store_api.main:app` runs the vector-store API on port `8088`
-- `survey_assist_vector_store_api.sayt_api.main:app` runs the SAYT API on port `8089`
+- `survey_assist_vector_store_api.sayt_api.main:app` runs the SAYT API on port `8090`
 - `scripts/build_vector_store_artifacts.py` builds embedding artifacts used by the vector-store API
 - `scripts/build_sayt_artifacts.py` builds SAYT artifacts used by the SAYT API
 
@@ -25,7 +25,7 @@ Shared modules under `src/survey_assist_vector_store_api/shared/` provide common
 The main local endpoints are:
 
 - Vector-store docs: `http://localhost:8088/docs`
-- SAYT docs: `http://localhost:8089/docs`
+- SAYT docs: `http://localhost:8090/docs`
 - Vector-store search: `POST /v1/search-index`
 - Vector-store configuration: `GET /v1/configuration`
 - SAYT suggestions: `POST /v1/suggestions`
@@ -104,13 +104,23 @@ make run-vector-store-api
 make run-sayt-api
 ```
 
+Direct `make` runs also read these values from `.env`. Exported shell
+variables and `make VAR=value` overrides take precedence. Docker and Podman
+Compose read the same values from `.env` or your shell environment:
+
+```bash
+make run-vector-store-api VECTOR_STORE_DIR=vector_store_soc VECTOR_STORE_PORT=8089
+SAYT_ARTIFACT_DIR=sayt_artifact_soc SAYT_PORT=8091 make run-sayt-api
+```
+
 #### Container prerequisites
+
 Before using Docker or Podman Compose, build the artifacts you want the containers to
 load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those
 local directories. The exact Compose service names are `vector-store-api` and
 `sayt-api`, while the exposed APIs remain the vector-store API on port `8088`
-and the SAYT API on port `8089`. Override those host ports with
-`VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` if needed.
+and the SAYT API on port `8090`. Override those host ports with
+`VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` or your shell environment if needed.
 
 #### Run the services with Docker Compose
 

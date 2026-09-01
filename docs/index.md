@@ -22,8 +22,8 @@ When running locally, each service exposes its own interactive documentation:
 
 - Vector-store Swagger UI: `http://localhost:8088/docs`
 - Vector-store ReDoc: `http://localhost:8088/redoc`
-- SAYT Swagger UI: `http://localhost:8089/docs`
-- SAYT ReDoc: `http://localhost:8089/redoc`
+- SAYT Swagger UI: `http://localhost:8090/docs`
+- SAYT ReDoc: `http://localhost:8090/redoc`
 
 ## Getting Started
 
