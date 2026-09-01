@@ -31,9 +31,7 @@ The main local endpoints are:
 - SAYT suggestions: `POST /v1/suggestions`
 - SAYT configuration: `GET /v1/configuration`
 
-The vector-store search endpoint accepts a `query` list of cumulative fragments.
-The SAYT suggestions endpoint accepts `query` plus optional positive `limit` and returns a JSON object whose `suggestions` field contains scored suggestion objects.
-For the SAYT suggestions endpoint, `limit` overrides the default for that request only. If it is omitted, the API uses the default suggestion count baked into the loaded SAYT artifact when it was built, configured via `DEFAULT_NUM_SUGGESTIONS`.
+The vector-store search endpoint accepts a `query` list of cumulative fragments. The SAYT suggestions endpoint accepts `query` plus optional positive `limit` and returns a JSON object whose `suggestions` field contains scored suggestion objects. For the SAYT suggestions endpoint, `limit` overrides the default for that request only. If it is omitted, the API uses the default suggestion count baked into the loaded SAYT artifact when it was built, configured via `DEFAULT_NUM_SUGGESTIONS`.
 
 ## Integration with Survey Assist API
 
@@ -97,6 +95,15 @@ make build-vector-store
 make build-sayt
 ```
 
+To prepare separate local artifacts for different taxonomies or knowledgebase sources, run the same build targets with different source-file and output-directory overrides:
+
+```bash
+make build-vector-store INDEX_SOURCE_FILE=path/to/sic_source.csv VECTOR_STORE_DIR=vector_store_sic
+make build-vector-store INDEX_SOURCE_FILE=path/to/soc_source.csv VECTOR_STORE_DIR=vector_store_soc
+make build-sayt SAYT_SOURCE_FILE=path/to/sic_sayt_source.csv SAYT_ARTIFACT_DIR=sayt_artifact_sic
+make build-sayt SAYT_SOURCE_FILE=path/to/soc_sayt_source.csv SAYT_ARTIFACT_DIR=sayt_artifact_soc
+```
+
 Run the services locally:
 
 ```bash
@@ -104,23 +111,18 @@ make run-vector-store-api
 make run-sayt-api
 ```
 
-Direct `make` runs also read these values from `.env`. Exported shell
-variables and `make VAR=value` overrides take precedence. Docker and Podman
-Compose read the same values from `.env` or your shell environment:
+Direct `make` runs can take these values from `.env`, exported shell variables, or `make VAR=value` overrides. When more than one source is set, shell variables and `make VAR=value` overrides take precedence. This keeps the workflow taxonomy-agnostic: the same targets can run SIC, SOC, or future knowledgebases by changing source-file, artifact-directory, and port variables. Docker and Podman Compose read the same values from `.env` or your shell environment:
 
 ```bash
+make run-vector-store-api VECTOR_STORE_DIR=vector_store_sic VECTOR_STORE_PORT=8088
 make run-vector-store-api VECTOR_STORE_DIR=vector_store_soc VECTOR_STORE_PORT=8089
-SAYT_ARTIFACT_DIR=sayt_artifact_soc SAYT_PORT=8091 make run-sayt-api
+make run-sayt-api SAYT_ARTIFACT_DIR=sayt_artifact_sic SAYT_PORT=8090
+make run-sayt-api SAYT_ARTIFACT_DIR=sayt_artifact_soc SAYT_PORT=8091
 ```
 
 #### Container prerequisites
 
-Before using Docker or Podman Compose, build the artifacts you want the containers to
-load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` at those
-local directories. The exact Compose service names are `vector-store-api` and
-`sayt-api`, while the exposed APIs remain the vector-store API on port `8088`
-and the SAYT API on port `8090`. Override those host ports with
-`VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` or your shell environment if needed.
+Before using Docker or Podman Compose, build the artifacts you want the containers to load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` or your shell environment at those local directories. The exact Compose service names are `vector-store-api` and `sayt-api`, while the exposed APIs remain the vector-store API on port `8088` and the SAYT API on port `8090`. Override those host ports with `VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` or your shell environment if needed.
 
 #### Run the services with Docker Compose
 
@@ -148,9 +150,7 @@ make docker-down
 
 ##### Podman resource requirements
 
-Loading the SAYT semantic model and persisted indexes may exceed the default
-Podman machine memory allocation. For representative datasets, allocate at
-least 8 GiB memory and enable swap:
+Loading the SAYT semantic model and persisted indexes may exceed the default Podman machine memory allocation. For representative datasets, allocate at least 8 GiB memory and enable swap:
 
 ```shell
 podman machine init \
@@ -227,7 +227,10 @@ The service implements robust error handling:
 
 ## Configuration
 
-Configuration is managed through environment variables loaded from `.env`.
+Configuration is managed through environment variables. For convenient local defaults, put them in `.env`; for one-off runs, export them in your shell or pass `make VAR=value` overrides.
+
+The same variables keep the workflow taxonomy-agnostic: point the build and runtime commands at different source files, artifact directories, and ports for SIC, SOC, or other knowledgebases.
+
 The main settings include:
 
 - Embedding model selection
@@ -235,13 +238,9 @@ The main settings include:
 - SAYT artifact directory and build inputs
 - SAYT build parameters such as minimum characters and default suggestion limit
 
-For day-to-day use, it helps to think of the variables in two groups: runtime
-variables used by the APIs when they start, and build variables used by the
-local artifact-generation scripts.
+For day-to-day use, it helps to think of the variables in two groups: runtime variables used by the APIs when they start, and build variables used by the local artifact-generation scripts.
 
-When using Docker Compose locally, `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR`
-should point to local artifact directories that can be bind-mounted into the
-containers.
+When using Docker Compose locally, `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` should point to local artifact directories that can be bind-mounted into the containers. For direct `make` runs, the same variables determine which taxonomy's artifacts each API loads.
 
 ### Runtime Variables
 
