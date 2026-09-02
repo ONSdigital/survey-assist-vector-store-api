@@ -88,8 +88,7 @@ poetry install
 
 ### Install Git Hooks
 
-This repository uses pre-commit hooks to perform code quality,
-security, and secret-scanning checks before code is committed.
+This repository uses pre-commit hooks to perform code quality, security, and secret-scanning checks before code is committed.
 
 ```shell
 poetry run pre-commit install
@@ -114,8 +113,7 @@ Build the SAYT artifacts:
 make build-sayt
 ```
 
-You can also run the build scripts directly and inspect their supported CLI
-flags with `--help`:
+You can also run the build scripts directly and inspect their supported CLI flags with `--help`:
 
 ```shell
 poetry run python scripts/build_vector_store_artifacts.py --help
@@ -136,13 +134,21 @@ Run the SAYT API:
 make run-sayt-api
 ```
 
+Direct `make` runs can take these values from `.env`, exported shell variables, or `make VAR=value` overrides. When more than one source is set, shell variables and `make VAR=value` overrides take precedence. This keeps the workflow taxonomy-agnostic: the same targets can run SIC, SOC, or future knowledgebases by changing artifact-directory and port variables. Docker and Podman Compose read the same values from `.env` or your shell environment:
+
+```shell
+make run-vector-store-api VECTOR_STORE_DIR=vector_store_sic VECTOR_STORE_PORT=8088
+make run-vector-store-api VECTOR_STORE_DIR=vector_store_soc VECTOR_STORE_PORT=8089
+make run-sayt-api SAYT_ARTIFACT_DIR=sayt_artifact_sic SAYT_PORT=8090
+make run-sayt-api SAYT_ARTIFACT_DIR=sayt_artifact_soc SAYT_PORT=8091
+```
+
 ### Run Containerised Services
 
-The repository includes a root `compose.yaml` and a root multi-stage
-`Dockerfile` for running the vector-store and SAYT APIs locally with Docker
-Compose.
+The repository includes a root `compose.yaml` and a root multi-stage `Dockerfile` for running the vector-store and SAYT APIs locally with Docker Compose.
 
 #### Using Docker
+
 Build the images, start the services, and stop them again with:
 
 ```shell
@@ -165,19 +171,17 @@ make podman-down
 By default, Docker or Podman Compose publishes:
 
 - vector-store API on `http://localhost:8088`
-- SAYT API on `http://localhost:8089`
+- SAYT API on `http://localhost:8090`
 
-For single-service runs, artifact-directory setup, and port overrides, see
-[the guide setup section](docs/guide.md#setup).
+For single-service runs, artifact-directory setup, and port overrides, see [the guide setup section](docs/guide.md#setup).
 
 ### API Documentation
 
 Vector-store docs: http://localhost:8088/docs
 
-SAYT docs: http://localhost:8089/docs
+SAYT docs: http://localhost:8090/docs
 
-The OpenAPI descriptions include the installed package versions for
-`survey-assist-vector-store-api` and `survey-assist-embed-core`.
+The OpenAPI descriptions include the installed package versions for `survey-assist-vector-store-api` and `survey-assist-embed-core`.
 
 Key endpoints:
 
@@ -186,15 +190,11 @@ Key endpoints:
 - SAYT suggestions: `POST /v1/suggestions`, accepting `query` and optional positive `limit`, and returning scored suggestions under `suggestions`
 - SAYT configuration: `GET /v1/configuration`, returning the loaded SAYT configuration
 
-For the SAYT suggestions endpoint, `limit` is an optional positive per-request
-override. If it is omitted, the API falls back to the default baked into the
-loaded SAYT artifact, which is set by `DEFAULT_NUM_SUGGESTIONS` when the
-artifact is built.
+For the SAYT suggestions endpoint, `limit` is an optional positive per-request override. If it is omitted, the API falls back to the default baked into the loaded SAYT artifact, which is set by `DEFAULT_NUM_SUGGESTIONS` when the artifact is built.
 
 ## Configuration
 
-Copy `.env.example` to `.env` and adjust values for your environment. The same
-`.env` file is used by both API runtimes and both local artifact-build scripts.
+Copy `.env.example` to `.env` if you want local defaults. You can also export the same variables in your shell or pass `make VAR=value` for one-off runs. The workflow is taxonomy-agnostic: point the same build and run commands at different source files, artifact directories, and ports for SIC, SOC, or other knowledgebases.
 
 The highest-signal variables are:
 
@@ -202,9 +202,7 @@ The highest-signal variables are:
 - `INDEX_SOURCE_FILE` for vector-store builds
 - `SAYT_SOURCE_FILE`, `SEARCH_TEXT_COL`, `DISPLAY_TEXT_COL`, `MIN_CHARS`, and `DEFAULT_NUM_SUGGESTIONS` for SAYT builds
 
-For the full runtime/build variable matrix, defaults, and notes about how
-`limit` interacts with `DEFAULT_NUM_SUGGESTIONS`, see
-[the guide configuration section](docs/guide.md#configuration).
+For the full runtime/build variable matrix, defaults, and notes about how `limit` interacts with `DEFAULT_NUM_SUGGESTIONS`, see [the guide configuration section](docs/guide.md#configuration).
 
 ## Repository Structure
 

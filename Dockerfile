@@ -60,6 +60,6 @@ CMD ["uvicorn", "survey_assist_vector_store_api.vector_store_api.main:app", "--h
 
 FROM runtime-base AS sayt
 
-EXPOSE 8089
+EXPOSE 8090
 
-CMD ["uvicorn", "survey_assist_vector_store_api.sayt_api.main:app", "--host", "0.0.0.0", "--port", "8089"]
+CMD ["uvicorn", "survey_assist_vector_store_api.sayt_api.main:app", "--host", "0.0.0.0", "--port", "8090"]

@@ -1,3 +1,11 @@
+# Preserve exported shell overrides over `.env` while keeping
+# `make VAR=value target` as the highest-precedence source.
+_ENV_OVERRIDE_VARS := $(foreach v,$(.VARIABLES),$(if $(filter environment environment override,$(origin $(v))),$(v)))
+$(foreach v,$(_ENV_OVERRIDE_VARS),$(eval _SAVED_ENV_$(v) := $($(v))))
+-include .env
+export
+$(foreach v,$(_ENV_OVERRIDE_VARS),$(eval $(v) := $(_SAVED_ENV_$(v))))
+
 .PHONY: all
 all: ## Show the available make targets.
 	@echo "Usage: make <target>"
@@ -10,9 +18,12 @@ clean: ## Clean the temporary files.
 	rm -rf .mypy_cache
 	rm -rf .ruff_cache
 
-# Make does not like interpreting : in the target name, so we use a variable
-VS_API_CMD=poetry run uvicorn survey_assist_vector_store_api.vector_store_api.main:app --host 0.0.0.0 --port 8088 --reload
-SAYT_API_CMD=poetry run uvicorn survey_assist_vector_store_api.sayt_api.main:app --host 0.0.0.0 --port 8089 --reload
+# Make does not like interpreting : in the target name, so we use a variable.
+# Override these with exported shell variables or `make VAR=value target`.
+VECTOR_STORE_PORT?=8088
+SAYT_PORT?=8090
+VS_API_CMD=poetry run uvicorn survey_assist_vector_store_api.vector_store_api.main:app --host 0.0.0.0 --port $(VECTOR_STORE_PORT) --reload
+SAYT_API_CMD=poetry run uvicorn survey_assist_vector_store_api.sayt_api.main:app --host 0.0.0.0 --port $(SAYT_PORT) --reload
 
 .PHONY: build-vector-store
 build-vector-store: ## Build the vector store
@@ -23,11 +34,11 @@ build-sayt: ## Build SAYT artifacts
 	poetry run python scripts/build_sayt_artifacts.py
 
 .PHONY: run-vector-store-api
-run-vector-store-api: ## Run the vector-store API
+run-vector-store-api: ## Run the vector-store API; optionally set/export VECTOR_STORE_PORT and VECTOR_STORE_DIR
 	$(VS_API_CMD)
 
 .PHONY: run-sayt-api
-run-sayt-api: ## Run the SAYT API
+run-sayt-api: ## Run the SAYT API; optionally set/export SAYT_PORT and SAYT_ARTIFACT_DIR
 	$(SAYT_API_CMD)
 
 .PHONY: run-docs
