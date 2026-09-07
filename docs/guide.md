@@ -124,12 +124,42 @@ make run-sayt-api SAYT_ARTIFACT_DIR=sayt_artifact_soc SAYT_PORT=8091
 
 Before using Docker or Podman Compose, build the artifacts you want the containers to load and point `VECTOR_STORE_DIR` and `SAYT_ARTIFACT_DIR` in `.env` or your shell environment at those local directories. The exact Compose service names are `vector-store-api` and `sayt-api`, while the exposed APIs remain the vector-store API on port `8088` and the SAYT API on port `8090`. Override those host ports with `VECTOR_STORE_PORT` and `SAYT_PORT` in `.env` or your shell environment if needed.
 
+The provided Compose file defines one vector-store service and one SAYT service per Compose project. If you want to run SIC and SOC side by side with Docker or Podman, use the same artifact-directory and port overrides as direct terminal runs, and give each stack its own `COMPOSE_PROJECT_NAME` so the containers, network, and host-port bindings stay separate.
+
 #### Run the services with Docker Compose
 
 ```bash
 make docker-build
 make docker-up
 ```
+
+To run SIC and SOC side by side with Docker Compose, start two separate Compose projects:
+
+Start the SIC stack:
+
+```bash
+make docker-up \
+   COMPOSE_PROJECT_NAME=sic-demo \
+   VECTOR_STORE_DIR=data/output/vector_store_sic_demo \
+   SAYT_ARTIFACT_DIR=data/output/sayt_artifact_sic_demo \
+   VECTOR_STORE_PORT=8088 \
+   SAYT_PORT=8090
+```
+
+Start the SOC stack:
+
+```bash
+make docker-up \
+   COMPOSE_PROJECT_NAME=soc-demo \
+   VECTOR_STORE_DIR=data/output/vector_store_soc_demo \
+   SAYT_ARTIFACT_DIR=data/output/sayt_artifact_soc_demo \
+   VECTOR_STORE_PORT=8089 \
+   SAYT_PORT=8091
+```
+
+This mirrors the direct terminal workflow: the same artifact directories and ports are used for each taxonomy, and `COMPOSE_PROJECT_NAME` is the extra value that keeps the two container stacks separate.
+
+`COMPOSE_PROJECT_NAME` is a built-in Docker Compose variable that names the stack and its resources.
 
 You can also target a single Compose service:
 
@@ -144,6 +174,13 @@ Stop the containers again with:
 
 ```bash
 make docker-down
+```
+
+For side-by-side Docker runs, stop each stack with the same project name you used to start it:
+
+```bash
+make docker-down COMPOSE_PROJECT_NAME=sic-demo
+make docker-down COMPOSE_PROJECT_NAME=soc-demo
 ```
 
 #### Run the services with Podman
@@ -166,6 +203,30 @@ Build and run both services:
 make podman-up
 ```
 
+The same side-by-side pattern works with Podman:
+
+Start the SIC stack:
+
+```bash
+make podman-up \
+   COMPOSE_PROJECT_NAME=sic-demo \
+   VECTOR_STORE_DIR=data/output/vector_store_sic_demo \
+   SAYT_ARTIFACT_DIR=data/output/sayt_artifact_sic_demo \
+   VECTOR_STORE_PORT=8088 \
+   SAYT_PORT=8090
+```
+
+Start the SOC stack:
+
+```bash
+make podman-up \
+   COMPOSE_PROJECT_NAME=soc-demo \
+   VECTOR_STORE_DIR=data/output/vector_store_soc_demo \
+   SAYT_ARTIFACT_DIR=data/output/sayt_artifact_soc_demo \
+   VECTOR_STORE_PORT=8089 \
+   SAYT_PORT=8091
+```
+
 Build and run sayt service:
 
 ```bash
@@ -181,7 +242,14 @@ podman compose up --build vector-store-api
 Stop the containers with:
 
 ```bash
-make docker-down
+make podman-down
+```
+
+For side-by-side Podman runs, stop each stack with:
+
+```bash
+make podman-down COMPOSE_PROJECT_NAME=sic-demo
+make podman-down COMPOSE_PROJECT_NAME=soc-demo
 ```
 
 ### Testing

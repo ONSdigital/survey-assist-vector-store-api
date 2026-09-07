@@ -220,3 +220,4 @@ __marimo__/
 # Default vector store artifact directories
 vector_store/
 sayt_artifact/
+data/output/

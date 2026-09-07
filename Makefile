@@ -90,15 +90,15 @@ colima-stop: ## Stop Colima
 	colima stop
 
 .PHONY: docker-build
-docker-build: ## Build container images; optionally set service=vector-store-api or service=sayt-api
+docker-build: ## Build container images; optionally set COMPOSE_PROJECT_NAME or service=vector-store-api/service=sayt-api
 	docker compose build $(service)
 
 .PHONY: docker-up
-docker-up: ## Run API containers; optionally set service=vector-store-api or service=sayt-api
+docker-up: ## Run API containers; optionally set COMPOSE_PROJECT_NAME, artifact dirs, ports, or service=vector-store-api/service=sayt-api
 	docker compose up --build $(service)
 
 .PHONY: docker-down
-docker-down: ## Stop the running API containers
+docker-down: ## Stop the running API containers; optionally set COMPOSE_PROJECT_NAME
 	docker compose down
 
 .PHONY: docker-clean
@@ -106,11 +106,11 @@ docker-clean: ## Clean Docker resources
 	DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock" docker system prune -f
 
 .PHONY: podman-up
-podman-up: ## Run API containers; optionally set service=vector-store-api or service=sayt-api
+podman-up: ## Run API containers; optionally set COMPOSE_PROJECT_NAME, artifact dirs, ports, or service=vector-store-api/service=sayt-api
 	podman compose up --build $(service)
 
 .PHONY: podman-down
-podman-down: ## Stop the running API containers
+podman-down: ## Stop the running API containers; optionally set COMPOSE_PROJECT_NAME
 	podman compose down
 
 .PHONY: colima-status

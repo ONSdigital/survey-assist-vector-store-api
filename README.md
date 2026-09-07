@@ -120,6 +120,8 @@ poetry run python scripts/build_vector_store_artifacts.py --help
 poetry run python scripts/build_sayt_artifacts.py --help
 ```
 
+For a toy-data walkthrough that uses checked-in demo CSVs to build both artifact types and exercise both APIs locally, see [docs/runbook.md](docs/runbook.md).
+
 ### Start Applications
 
 Run the vector-store API:
@@ -211,6 +213,7 @@ Update as the repository evolves
 ```txt
 survey-assist-vector-store-api/
 |-- cicd/                           # GCP cloud build cicd pipelines
+|-- data/                           # checked-in datasets for local walkthroughs
 |-- docs/                           # mkdocs documentation
 |-- scripts/                        # scripts not used inline in the application
 |-- src/                            # main source
@@ -277,6 +280,7 @@ Repository ownership and review responsibility are listed in [CODEOWNERS](CODEOW
 
 ## Additional Documentation
 
+- [docs/runbook.md](docs/runbook.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [RELEASING.md](RELEASING.md)
 - [SECURITY.md](SECURITY.md)
