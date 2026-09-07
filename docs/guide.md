@@ -242,7 +242,7 @@ podman compose up --build vector-store-api
 Stop the containers with:
 
 ```bash
-make docker-down
+make podman-down
 ```
 
 For side-by-side Podman runs, stop each stack with:
