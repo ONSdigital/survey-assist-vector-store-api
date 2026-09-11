@@ -1,0 +1,162 @@
+steps:
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        set -e
+        echo === Check Tooling Versions ===
+        gcloud --version
+        make --version
+        pip --version
+        python --version
+        poetry --version
+
+        echo === Looking up config from parameter store ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        CR_BUCKET=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-bucket'])")
+
+        echo === Download index and structure files from GCS ===
+        gsutil cp -r gs://$$CR_BUCKET/sayt_vector_store_config/data src/
+        gsutil cp -r gs://$$CR_BUCKET/sic_vector_store_config/data src/
+        gsutil cp -r gs://$$CR_BUCKET/soc_vector_store_config/data src/
+
+        echo === Install dependencies ===
+        poetry install
+    
+    id: Setup
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Build SIC artifacts ===
+        export INDEX_SOURCE_FILE=src/data/sic_kb_for_classifai.csv
+        export VECTOR_STORE_DIR=/workspace/vector_store_sic
+        poetry run python scripts/build_vector_store_artifacts.py
+        mv /workspace/vector_store_sic src/
+        ls -l src/vector_store_sic
+
+    id: Build SIC artifact
+    entrypoint: bash
+    waitFor: Setup
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Build SOC artifacts ===
+        export INDEX_SOURCE_FILE=src/data/soc_kb_for_classifai.csv
+        export VECTOR_STORE_DIR=/workspace/vector_store_soc
+        poetry run python scripts/build_vector_store_artifacts.py
+        mv /workspace/vector_store_soc src/
+        ls -l src/vector_store_soc
+
+    id: Build SOC artifact
+    waitFor: Setup
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Build SAYT artifacts ===
+        export SAYT_SOURCE_FILE=src/data/sic_kb_for_sayt.csv
+        poetry run python scripts/build_sayt_artifacts.py
+        mv /workspace/sayt_artifact src/
+        ls -l src/sayt_artifact
+
+    id: Build SAYT artifact
+    waitFor: Setup
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Running unit tests ===
+        poetry run pytest --ignore=cicd -q --maxfail=1 --disable-warnings --cov-report term-missing --cov-fail-under=80 | tee coverage-report.txt
+        if grep -q "FAIL Required test coverage" coverage-report.txt; then
+          echo "ERROR: Target coverage was not reached, stopping pipeline."
+          exit 1
+        fi
+
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+
+        echo === Build Docker image, tag and push to GAR ===
+        docker build -f Dockerfile -t $$VECTOR_STORE_IMAGE:$SHORT_SHA -t $$VECTOR_STORE_IMAGE:latest .
+        docker push $$VECTOR_STORE_IMAGE:latest
+        docker push $$VECTOR_STORE_IMAGE:$SHORT_SHA
+        
+    id: Run unit tests and package
+    waitFor: ["Build SIC artifact", "Build SOC artifact", "Build SAYT artifact"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Deploy SIC API ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+
+        gcloud run deploy sic-vector-store --image=$$VECTOR_STORE_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.vector_store_api.main:app,--host=0.0.0.0" --args="--port=8088"
+    id: Deploy SIC API
+    waitFor: ["Run unit tests and package"]
+    #waitFor: ["Setup"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Deploy SOC API ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+
+        gcloud run deploy soc-vector-store --image=$$VECTOR_STORE_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.vector_store_api.main:app,--host=0.0.0.0" --args="--port=8088"
+    id: Deploy SOC API
+    waitFor: ["Run unit tests and package"]
+    #waitFor: ["Setup"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Deploy SAYT API ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+
+        gcloud run deploy sayt-vector-store --image=$$VECTOR_STORE_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.sayt_api.main:app,--host=0.0.0.0" --args="--port=8090"
+    id: Deploy SAYT API
+    waitFor: ["Run unit tests and package"]
+    #waitFor: ["Setup"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+ 
+        echo === Run smoke tests ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        
+        export TARGET_ENVIRONMENT=$_ENV_NAME
+        export UI_SA_ID_TOKEN=$(gcloud auth print-identity-token) # Use CICD service account
+        export SIC_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sic-api-url'])")
+        export SOC_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-soc-api-url'])")
+        export SAYT_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
+        poetry run pytest -s cicd
+
+    id: Run smoke tests
+    waitFor: ["Deploy SIC API", "Deploy SOC API", "Deploy SAYT API"]
+    entrypoint: bash
+timeout: 6000s
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
