@@ -72,9 +72,7 @@ class TestSicSocSaytApi:  # pylint: disable=too-few-public-methods
         print(f"Calling {endpoint}...")
         response = requests.post(
             endpoint,
-            json={
-                "query": ["school teacher", "teach maths", "school"]
-            },
+            json={"query": ["school teacher", "teach maths", "school"]},
             headers={"Authorization": f"Bearer {self.id_token}"},
             timeout=30,
         )
@@ -91,9 +89,7 @@ class TestSicSocSaytApi:  # pylint: disable=too-few-public-methods
         print(f"Calling {endpoint}...")
         response = requests.post(
             endpoint,
-            json={
-                "query": ["school teacher", "teach maths", "school"]
-            },
+            json={"query": ["school teacher", "teach maths", "school"]},
             headers={"Authorization": f"Bearer {self.id_token}"},
             timeout=30,
         )
