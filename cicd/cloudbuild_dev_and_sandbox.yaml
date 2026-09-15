@@ -105,7 +105,6 @@ steps:
         gcloud run deploy sic-vector-store --image=$$VECTOR_STORE_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.vector_store_api.main:app,--host=0.0.0.0" --args="--port=8080"
     id: Deploy SIC API
     waitFor: ["Run unit tests and package"]
-    #waitFor: ["Setup"]
     entrypoint: bash
 
   - name: gcr.io/$PROJECT_ID/testrunner
@@ -120,7 +119,6 @@ steps:
         gcloud run deploy soc-vector-store --image=$$VECTOR_STORE_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.vector_store_api.main:app,--host=0.0.0.0" --args="--port=8080"
     id: Deploy SOC API
     waitFor: ["Run unit tests and package"]
-    #waitFor: ["Setup"]
     entrypoint: bash
 
   - name: gcr.io/$PROJECT_ID/testrunner
@@ -135,7 +133,6 @@ steps:
         gcloud run deploy sayt-vector-store --image=$$VECTOR_STORE_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.sayt_api.main:app,--host=0.0.0.0" --args="--port=8080"
     id: Deploy SAYT API
     waitFor: ["Run unit tests and package"]
-    #waitFor: ["Setup"]
     entrypoint: bash
 
   - name: gcr.io/$PROJECT_ID/testrunner
