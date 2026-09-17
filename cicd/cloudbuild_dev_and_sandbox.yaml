@@ -39,7 +39,7 @@ steps:
 
     id: Build SIC artifact
     entrypoint: bash
-    waitFor: Setup
+    waitFor: ["Setup"]
 
   - name: gcr.io/$PROJECT_ID/testrunner
     args:
@@ -53,7 +53,7 @@ steps:
         ls -l src/vector_store_soc
 
     id: Build SOC artifact
-    waitFor: Setup
+    waitFor: ["Setup"]
     entrypoint: bash
 
   - name: gcr.io/$PROJECT_ID/testrunner
@@ -67,7 +67,7 @@ steps:
         ls -l src/sayt_artifact
 
     id: Build SAYT artifact
-    waitFor: Setup
+    waitFor: ["Setup"]
     entrypoint: bash
 
   - name: gcr.io/$PROJECT_ID/testrunner
