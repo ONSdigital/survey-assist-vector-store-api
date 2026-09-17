@@ -23,7 +23,7 @@ steps:
     id: Tag and push release image
     entrypoint: bash
 
- - name: gcr.io/$PROJECT_ID/testrunner
+  - name: gcr.io/$PROJECT_ID/testrunner
     args:
       - '-c'
       - |
