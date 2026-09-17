@@ -12,7 +12,7 @@ steps:
         VECTOR_STORE_IMAGE_RELEASES=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
   
         echo === Pulling image dev image with tag $SHORT_SHA ===
-        docker pull $$VECTOR_STORE_API_IMAGE_DEV:$SHORT_SHA
+        docker pull $$VECTOR_STORE_IMAGE_DEV:$SHORT_SHA
 
         echo === Build Docker image, tag and push to GAR ===
         docker tag $$VECTOR_STORE_IMAGE_DEV:$SHORT_SHA $$VECTOR_STORE_IMAGE_RELEASES:$TAG_NAME
