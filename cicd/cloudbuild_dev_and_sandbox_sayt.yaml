@@ -1,0 +1,61 @@
+steps:
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        set -e
+        echo === Check Tooling Versions ===
+        gcloud --version
+        make --version
+        pip --version
+        python --version
+        poetry --version
+
+        echo === Looking up config from parameter store ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        SAYT_API_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-image'])")
+        SAYT_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+        CR_BUCKET=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-bucket'])")
+
+        echo === Download index and structure files from GCS ===
+        gsutil cp -r gs://$$CR_BUCKET/sayt_vector_store_config/data src/
+        ls -l
+        ls -l src
+        ls -l src/data
+
+        echo === Install dependencies ===
+        poetry install
+
+        echo === Build SAYT artifacts ===
+        export SAYT_SOURCE_FILE=src/data/sic_kb_for_sayt.csv
+        poetry run python scripts/build_sayt_artifacts.py
+        mv /workspace/sayt_artifact src/
+
+        echo === Running unit tests ===
+        poetry run pytest --ignore=cicd -q --maxfail=1 --disable-warnings --cov-report term-missing --cov-fail-under=80 | tee coverage-report.txt
+        if grep -q "FAIL Required test coverage" coverage-report.txt; then
+          echo "ERROR: Target coverage was not reached, stopping pipeline."
+          exit 1
+        fi
+
+        echo === Build Docker image, tag and push to GAR ===
+        docker build -t $$SAYT_API_IMAGE:$SHORT_SHA -t $$SAYT_API_IMAGE:latest .
+        docker push $$SAYT_API_IMAGE:latest
+        docker push $$SAYT_API_IMAGE:$SHORT_SHA
+        
+        echo === Deploy SAYT API ===
+        gcloud run deploy sayt-vector-store --image=$$SAYT_API_IMAGE:$SHORT_SHA --region $LOCATION --project $$TARGET_PROJECT_ID
+
+        echo === Run smoke tests ===
+        export TARGET_ENVIRONMENT=$_ENV_NAME
+        export UI_SA_ID_TOKEN=$(gcloud auth print-identity-token) # Use CICD service account
+        export SAYT_API_URL=$$SAYT_API_URL
+        poetry run pytest -s cicd
+
+    id: Run unit tests, build, tag and deploy SAYT cloud run job
+    entrypoint: bash
+timeout: 2700s
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'

@@ -18,7 +18,7 @@ CICD_SA=$(echo $sandbox_config | python3 -c "import sys, json; print(json.load(s
 REGION=$(echo $sandbox_config | python3 -c "import sys, json; print(json.load(sys.stdin)['region'])")
 CB_BUCKET=gs://${PROJECT_ID}_cloudbuild/vector-store
 
-gcloud beta builds submit . --config=cicd/cloudbuild_dev_and_sandbox.yaml \
+gcloud beta builds submit . --config=cicd/cloudbuild_dev_and_sandbox_combined.yaml \
 	--project $CICD_PROJECT_ID \
 	--service-account projects/$CICD_PROJECT_ID/serviceAccounts/$CICD_SA \
 	--gcs-source-staging-dir $CB_BUCKET \
