@@ -17,18 +17,20 @@ logger = get_logger(__name__)
 def _cloud_run_cpu_limit() -> float | str | None:
     cpu_max_path = Path("/sys/fs/cgroup/cpu.max")
     if cpu_max_path.exists():
-        quota, period = cpu_max_path.read_text(encoding="utf-8").strip().split()
-        if quota == "max":
+        quota_text, period_text = (
+            cpu_max_path.read_text(encoding="utf-8").strip().split()
+        )
+        if quota_text == "max":
             return "max"
-        return int(quota) / int(period)
+        return int(quota_text) / int(period_text)
 
     quota_path = Path("/sys/fs/cgroup/cpu/cpu.cfs_quota_us")
     period_path = Path("/sys/fs/cgroup/cpu/cpu.cfs_period_us")
     if quota_path.exists() and period_path.exists():
-        quota = int(quota_path.read_text(encoding="utf-8").strip())
-        period = int(period_path.read_text(encoding="utf-8").strip())
-        if quota > 0:
-            return quota / period
+        quota_us = int(quota_path.read_text(encoding="utf-8").strip())
+        period_us = int(period_path.read_text(encoding="utf-8").strip())
+        if quota_us > 0:
+            return quota_us / period_us
         return "max"
 
     return None
