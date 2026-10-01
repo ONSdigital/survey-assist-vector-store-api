@@ -6,33 +6,84 @@ steps:
         set -e
         echo === Looking up config from parameter store ===
         dev_config=$(gcloud parametermanager parameters versions describe dev --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
-        SAYT_API_IMAGE_DEV=$(echo $dev_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-image'])")
+        VECTOR_STORE_IMAGE_DEV=$(echo $dev_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
 
         preprod_config=$(gcloud parametermanager parameters versions describe preprod --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
-        SAYT_API_IMAGE_RELEASES=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-image'])")
-        SAYT_API_URL=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
-        TARGET_PROJECT_ID=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
-        
+        VECTOR_STORE_IMAGE_RELEASES=$(echo $preprod_config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+  
         echo === Pulling image dev image with tag $SHORT_SHA ===
-        docker pull $$SAYT_API_IMAGE_DEV:$SHORT_SHA
+        docker pull $$VECTOR_STORE_IMAGE_DEV:$SHORT_SHA
 
         echo === Build Docker image, tag and push to GAR ===
-        docker tag $$SAYT_API_IMAGE_DEV:$SHORT_SHA $$SAYT_API_IMAGE_RELEASES:$TAG_NAME
-        docker tag $$SAYT_API_IMAGE_DEV:$SHORT_SHA $$SAYT_API_IMAGE_RELEASES:latest
-        docker push $$SAYT_API_IMAGE_RELEASES:$TAG_NAME
-        docker push $$SAYT_API_IMAGE_RELEASES:latest
-
-        echo === Deploy SAYT API ===
-        gcloud run deploy sayt-vector-store --image=$$SAYT_API_IMAGE_RELEASES:$TAG_NAME --region $LOCATION --project $$TARGET_PROJECT_ID
-
-        echo === Run smoke tests ===
-        export TARGET_ENVIRONMENT=$_ENV_NAME
-        export UI_SA_ID_TOKEN=$(gcloud auth print-identity-token) # Use CICD service account
-        export SAYT_API_URL=$$SAYT_API_URL
-        poetry run pytest -s cicd
+        docker tag $$VECTOR_STORE_IMAGE_DEV:$SHORT_SHA $$VECTOR_STORE_IMAGE_RELEASES:$TAG_NAME
+        docker tag $$VECTOR_STORE_IMAGE_DEV:$SHORT_SHA $$VECTOR_STORE_IMAGE_RELEASES:latest
+        docker push $$VECTOR_STORE_IMAGE_RELEASES:$TAG_NAME
+        docker push $$VECTOR_STORE_IMAGE_RELEASES:latest
 
     id: Tag and push release image
     entrypoint: bash
-timeout: 2000s
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Deploy SIC API ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+
+        gcloud run deploy sic-vector-store --image=$$VECTOR_STORE_IMAGE:$TAG_NAME --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.vector_store_api.main:app,--host=0.0.0.0" --args="--port=8080"
+    id: Deploy SIC API
+    waitFor: ["Tag and push release image"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Deploy SOC API ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+
+        gcloud run deploy soc-vector-store --image=$$VECTOR_STORE_IMAGE:$TAG_NAME --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.vector_store_api.main:app,--host=0.0.0.0" --args="--port=8080"
+    id: Deploy SOC API
+    waitFor: ["Tag and push release image"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+        echo === Deploy SAYT API ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        VECTOR_STORE_IMAGE=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-vector-store-image'])")
+        TARGET_PROJECT_ID=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['project-id'])")
+
+        gcloud run deploy sayt-vector-store --image=$$VECTOR_STORE_IMAGE:$TAG_NAME --region $LOCATION --project $$TARGET_PROJECT_ID --command="uvicorn" --args="survey_assist_vector_store_api.sayt_api.main:app,--host=0.0.0.0" --args="--port=8080"
+    id: Deploy SAYT API
+    waitFor: ["Tag and push release image"]
+    entrypoint: bash
+
+  - name: gcr.io/$PROJECT_ID/testrunner
+    args:
+      - '-c'
+      - |
+ 
+        echo === Run smoke tests ===
+        config=$(gcloud parametermanager parameters versions describe $_ENV_NAME --parameter=infra-test-config --location=global --project $PROJECT_ID --format=json | python3 -c "import sys, json; print(json.load(sys.stdin)['payload']['data'])" | base64 --decode)
+        
+        export TARGET_ENVIRONMENT=$_ENV_NAME
+        export UI_SA_ID_TOKEN=$(gcloud auth print-identity-token) # Use CICD service account
+        export SIC_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sic-api-url'])")
+        export SOC_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-soc-api-url'])")
+        export SAYT_API_URL=$(echo $config | python3 -c "import sys, json; print(json.load(sys.stdin)['cr-sayt-api-url'])")
+        poetry run pytest -s cicd
+
+    id: Run smoke tests
+    waitFor: ["Deploy SIC API", "Deploy SOC API", "Deploy SAYT API"]
+    entrypoint: bash
+
+timeout: 5000s
 options:
   logging: CLOUD_LOGGING_ONLY
